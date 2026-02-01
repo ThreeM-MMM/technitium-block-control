@@ -8,30 +8,49 @@
         <link rel="stylesheet" href="popup.css" />
     </head>
     <body>
-        <h1 data-i18n="popup_heading">Technitium Adblock Control</h1>
-
-        <div class="statusLine" id="state" data-i18n="popup_loading">Lade...</div>
-
-        <div class="topRow">
-            <button id="toggle" style="display: none">...</button>
-        </div>
-
-        <div class="inputRow" style="margin-top: 10px">
-            <input
-                id="customMinutes"
-                type="number"
-                min="1"
-                max="1440"
-                data-i18n-placeholder="popup_minutes_placeholder"
-                data-i18n-aria-label="popup_minutes_aria"
-                placeholder="Minuten"
+        <button id="themeToggle" class="themeToggle" data-i18n-title="popup_theme_toggle" data-i18n-aria-label="popup_theme_toggle" title="Switch theme" aria-label="Switch theme">☀</button>
+        <h1 class="title">
+            <img
+                class="titleIcon"
+                src="../icons/icon32.png"
+                alt="Technitium Adblock Control"
             />
-            <button id="startCustom" data-i18n="popup_start">Start</button>
+            <span data-i18n="popup_heading">Technitium Adblock Control</span>
+        </h1>
+
+        <div class="toolbar" id="toolbar">
+            <div class="toolbarRow">
+                <div class="toolbarStatus" id="state" data-i18n="popup_loading">
+                    Loading...
+                </div>
+
+                <div class="toolbarActions">
+                    <button id="toggle" style="display: none">...</button>
+
+                    <button id="startCustom" data-i18n="popup_start">
+                        Disable blocking for:
+                    </button>
+
+                    <div class="minutesWrap">
+                        <input
+                            id="customMinutes"
+                            class="minutesInput"
+                            type="number"
+                            min="1"
+                            max="1440"
+                            data-i18n-placeholder="popup_minutes_placeholder"
+                            data-i18n-aria-label="popup_minutes_aria"
+                            placeholder="Minutes"
+                        />
+                        <span class="minutesUnit" data-i18n="popup_minutes_unit">min</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="toolbarSub">
+                <div class="small" id="timerState"></div>
+            </div>
         </div>
-        <div class="small" data-i18n="popup_temp_disable_help">
-            Temporär deaktivieren (1–1440 Minuten)
-        </div>
-        <div class="small" id="timerState"></div>
 
         <div class="section">
             <div class="headerRow">
@@ -66,6 +85,7 @@
             </div>
         </div>
 
+        <script src="../common/theme.js"></script>
         <script src="../common/i18n.js"></script>
         <script src="popup.js"></script>
     </body>

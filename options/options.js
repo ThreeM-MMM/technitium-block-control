@@ -4,6 +4,7 @@ const logWindowSecondsInput = document.getElementById("logWindowSeconds");
 const tempAllowMinutesInput = document.getElementById("tempAllowMinutes");
 const showAllowStatusInput = document.getElementById("showAllowStatus");
 const uiLanguageSelect = document.getElementById("uiLanguage");
+const uiThemeSelect = document.getElementById("uiTheme");
 const status = document.getElementById("status");
 
 const t = (key, subs) => {
@@ -31,6 +32,7 @@ chrome.storage.local.get(
     "tempAllowMinutes",
     "showAllowStatus",
     "uiLanguage",
+    "uiTheme",
   ],
   (data) => {
     baseUrlInput.value = data.baseUrl || "";
@@ -47,6 +49,10 @@ chrome.storage.local.get(
 
     if (uiLanguageSelect) {
       uiLanguageSelect.value = data.uiLanguage || "system";
+    }
+
+    if (uiThemeSelect) {
+      uiThemeSelect.value = data.uiTheme || "auto";
     }
   },
 );
@@ -73,6 +79,7 @@ document.getElementById("save").addEventListener("click", () => {
       tempAllowMinutes,
       showAllowStatus: !!showAllowStatusInput.checked,
       uiLanguage: uiLanguageSelect ? uiLanguageSelect.value : "system",
+      uiTheme: uiThemeSelect ? uiThemeSelect.value : "auto",
     },
     () => {
       status.textContent = t("options_saved");
@@ -81,6 +88,11 @@ document.getElementById("save").addEventListener("click", () => {
       // Apply language switch immediately
       if (window.TAC_I18N) {
         window.TAC_I18N.init().then(() => window.TAC_I18N.localizePage());
+      }
+
+      // Apply theme switch immediately
+      if (window.TAC_THEME && uiThemeSelect) {
+        window.TAC_THEME.apply(uiThemeSelect.value || "auto");
       }
     },
   );

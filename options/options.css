@@ -6,6 +6,76 @@
     --border: #e6e6e6;
     --accent: #e9f7ee;
     --accentBorder: #bfe7c8;
+
+    --btn-bg: #f7f7f7;
+    --btn-bg-hover: #eeeeee;
+    --btn-border: #cfcfcf;
+    --btn-text: #222;
+}
+
+/* Auto dark mode (follows system/browser preference) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0f1115;
+        --card: #121723;
+        --text: #e8eaf0;
+        --muted: #a3a9b7;
+        --border: #2a3242;
+        --accent: #0f2a1a;
+        --accentBorder: #1b5a34;
+
+        --btn-bg: #161c2a;
+        --btn-bg-hover: #1b2233;
+        --btn-border: #2a3242;
+        --btn-text: #e8eaf0;
+    }
+}
+
+/* Forced themes override auto */
+[data-theme="dark"] {
+    --bg: #0f1115;
+    --card: #121723;
+    --text: #e8eaf0;
+    --muted: #a3a9b7;
+    --border: #2a3242;
+    --accent: #0f2a1a;
+    --accentBorder: #1b5a34;
+
+    --btn-bg: #161c2a;
+    --btn-bg-hover: #1b2233;
+    --btn-border: #2a3242;
+    --btn-text: #e8eaf0;
+}
+
+[data-theme="light"] {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --text: #111;
+    --muted: #666;
+    --border: #e6e6e6;
+    --accent: #e9f7ee;
+    --accentBorder: #bfe7c8;
+
+    --btn-bg: #f7f7f7;
+    --btn-bg-hover: #eeeeee;
+    --btn-border: #cfcfcf;
+    --btn-text: #222;
+}
+
+/* Gray theme ("dim") */
+[data-theme="gray"] {
+    --bg: #1b1d21;
+    --card: #23262c;
+    --text: #e6e7eb;
+    --muted: #b0b4be;
+    --border: #363a43;
+    --accent: #173222;
+    --accentBorder: #2b6b44;
+
+    --btn-bg: #2a2e36;
+    --btn-bg-hover: #313642;
+    --btn-border: #454b57;
+    --btn-text: #e6e7eb;
 }
 
 * {
@@ -119,7 +189,7 @@ h2 {
     width: 18px;
     height: 18px;
     border-radius: 4px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     flex: 0 0 auto;
 }
 
@@ -148,16 +218,23 @@ h2 {
     padding: 2px 8px;
     font-size: 12px;
     border-radius: 999px;
-    border: 1px solid #ddd;
-    background: #f3f3f3;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--card) 80%, var(--border));
+}
+
+.pillStack {
+    display: flex;
+    gap: 6px;
+    align-items: center;
 }
 
 .btnMock {
     padding: 6px 10px;
     border-radius: 10px;
-    border: 1px solid #cfcfcf;
+    border: 1px solid var(--btn-border);
     font-size: 12px;
-    background: #fff;
+    background: var(--btn-bg);
+    color: var(--btn-text);
 }
 
 /* ===== Form Fields ===== */
@@ -179,8 +256,10 @@ input[type="number"] {
     margin-top: 6px;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid #d9d9d9;
+    border: 1px solid var(--border);
     font-size: 14px;
+    background: var(--card);
+    color: var(--text);
 }
 
 select {
@@ -188,9 +267,10 @@ select {
     margin-top: 6px;
     padding: 10px 12px;
     border-radius: 10px;
-    border: 1px solid #d9d9d9;
+    border: 1px solid var(--border);
     font-size: 14px;
-    background: #fff;
+    background: var(--card);
+    color: var(--text);
 }
 
 .help {
@@ -218,10 +298,15 @@ select {
 button {
     padding: 9px 16px;
     border-radius: 10px;
-    border: 1px solid #cfcfcf;
-    background: #fff;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-text);
     cursor: pointer;
     font-size: 14px;
+}
+
+button:hover {
+    background: var(--btn-bg-hover);
 }
 
 .status {

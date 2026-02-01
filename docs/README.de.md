@@ -1,31 +1,33 @@
-# <img src="icons/icon48.png" alt="Technitium Adblock Control" width="28" /> Technitium Adblock Control
+# <img src="../icons/icon48.png" alt="Technitium Adblock Control" width="28" /> Technitium Adblock Control
 
-**Sprache:** [English](README.en.md) | **Deutsch**
+Zur englischen README: [../README.md](../README.md)
 
-> Eine leistungsstarke Browser-Extension für Chrome & Vivaldi zur direkten Steuerung der Block-Funktion des [Technitium DNS Servers](https://technitium.com/dns/).
+> Eine leistungsstarke Browser-Extension für Chrome & Vivaldi zur Steuerung der Block-Funktion des [Technitium DNS Servers](https://technitium.com/dns/).
 
-![Version](https://img.shields.io/badge/version-0.2.1-blue.svg) ![Manifest](https://img.shields.io/badge/manifest-V3-success.svg) ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![Version](https://img.shields.io/badge/version-0.3.0-blue.svg) ![Manifest](https://img.shields.io/badge/manifest-V3-success.svg) ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
-**Technitium Adblock Control (TAC)** verbindet deinen Browser live mit deinem Technitium DNS-Server. TAC ermöglicht es dir, Adblocking global zu steuern, Logs in Echtzeit einzusehen und geblockte Domains kontextbezogen zur aktuell geöffneten Webseite freizugeben oder die Freigabe wieder zu entfernen.
+**Technitium Adblock Control (TAC)** verbindet deinen Browser live mit deinem Technitium DNS-Server. Du kannst DNS-Blocking global steuern, Query-Logs in Echtzeit einsehen und geblockte Domains kontextbezogen zur aktuell geöffneten Webseite freigeben (oder Freigaben wieder entfernen).
 
 ---
 
 ## ✨ Features
 
-* **⚡ Live-Status & Steuerung:** DNS-Blocking mit einem Klick an-/ausschalten.
-* **⏱️ Temporäres Deaktivieren:** Blocking für X Minuten pausieren.
-* **🎯 Kontext-Awareness:** Erkennt automatisch, welche geblockten Domains zur *aktuell* geöffneten Webseite gehören (Subdomain-Matching zwischen Browser-Ressourcen und DNS-Logs).
+* **⚡ Live-Status & Steuerung:** DNS-Blocking mit einem Klick an/aus.
+* **⏱️ Temporär deaktivieren:** Blocking für X Minuten pausieren (Timer).
+* **🎯 Kontext-Awareness:** Zeigt, welche geblockten Domains zur *aktuell geöffneten* Seite gehören (Abgleich Browser-Ressourcen-Hosts ↔ Technitium Query Logs).
+* **🏷️ Ressourcen-Typ Badges:** Zusätzliche Tags wie **IMG / JS / CSS / XHR / FONT / FRAME / MEDIA** zeigen, wofür eine Domain genutzt wird (abgeleitet aus `performance.getEntriesByType('resource')`).
 * **🔓 Granulare Freigaben:**
-  * **Allow:** Domain dauerhaft auf die Whitelist setzen.
-  * **Temp Allow:** Domain nur für eine definierte Zeit (z.B. 30 Min) erlauben.
-* **🕵️‍♂️ Automatische Client-Erkennung:** Ermittelt automatisch die korrekte IP-Adresse des Browsers im Netzwerk, um nur relevante Logs anzuzeigen (selbst bei dynamischen IPs).
-* **🚀 Performance:** Caching für Client-IP & Query-Logger-Erkennung sowie effiziente API-Calls im Hintergrund (Allow-Status optional per Batch-Check).
+  * **Allow:** Domain dauerhaft erlauben.
+  * **Temp Allow:** Domain nur für eine definierte Zeit erlauben (z. B. 30 Minuten).
+* **🕵️‍♂️ Automatische Client-Erkennung:** Ermittelt deine Client-IP per DNS-Log-Trick (funktioniert auch bei dynamischen IPs).
+* **🌍 Mehrsprachige Oberfläche:** Nutzt standardmäßig die System-/Browsersprache (Deutsch/Englisch). In den Optionen kannst du die Sprache manuell umstellen.
+* **🎨 Themes:** Standardmäßig folgt die Extension dem System-Theme. In den Optionen kannst du **Hell / Grau / Dunkel** erzwingen.
 
 ## 📸 Screenshots
 
 | Popup Übersicht | Einstellungen |
 |:---:|:---:|
-| ![Popup](docs/popup_screenshot.png) | ![Options](docs/options_screenshot.png) |
+| ![Popup](popup_screenshot.png) | ![Options](options_screenshot.png) |
 
 ---
 
@@ -33,7 +35,7 @@
 
 Da die Extension noch nicht im Chrome Web Store verfügbar ist, muss sie manuell installiert werden:
 
-1. Klone dieses Repository oder lade es als ZIP herunter und entpacke das Archiv.
+1. Klone dieses Repository oder lade es als ZIP herunter und entpacke es.
 2. Öffne deinen Browser (Chrome, Vivaldi, Edge, Brave).
 3. Gehe zu `chrome://extensions`.
 4. Aktiviere oben rechts den **Entwicklermodus**.
@@ -44,40 +46,46 @@ Da die Extension noch nicht im Chrome Web Store verfügbar ist, muss sie manuell
 
 Nach der Installation muss die Extension mit deinem Technitium Server verbunden werden:
 
-1. Klicke mit der rechten Maustaste auf das Extension-Icon -> **Optionen**.
-2. **Basis-URL:** Die URL deines Technitium Web-Panels (z.B. `http://192.168.1.10:5380`).
-3. **API Token:** API Token aus Technitium hinterlegen. Tipp:
-   * Gehe in dein Technitium Web-Panel.
-   * Navigiere zu `Settings` > `Web Service`.
-   * Erstelle einen neuen Token oder User für die API.
-4. Speichern klicken.
+1. Rechtsklick auf das Extension-Icon → **Optionen**.
+2. **Basis-URL:** URL deines Technitium Web-Panels (z. B. `http://192.168.1.10:5380`).
+3. **API Token:**
+   * Im Technitium Web-Panel: `Settings` → `Web Service`.
+   * Token/User mit ausreichenden Rechten für Settings, Logs und Allowlist erstellen.
+4. Speichern.
 
 ---
 
 ## ✅ Voraussetzungen / Hinweise
 
-* **Query Logging muss aktiv sein** (Query Logger DNS App).
+* **Query Logging muss aktiv sein** (Query Logger DNS App / SQLite Query Logs).
 * Dein Client muss **Technitium als DNS** nutzen, sonst erscheinen keine passenden Log-Einträge.
-* **DNS-Cache** kann dazu führen, dass kurzfristig keine neuen Log-Treffer entstehen (bei Bedarf Seite hart neu laden).
+* **DNS-Cache** kann „frische“ Log-Treffer reduzieren. Wenn das Popup leer wirkt, hilft oft ein Hard-Reload der Seite.
 
 ---
 
 ## 🧠 Wie es funktioniert (Technical Deep Dive)
 
-Diese Extension nutzt einige Kniffe, um die Limitierungen einer Browser-Umgebung zu umgehen:
+### 1) Der „Magic IP“-Trick
 
-### 1. Richtige IP
-Da eine Browser-Extension keinen Zugriff auf die Netzwerk-Infrastruktur hat, weiß sie oft nicht, unter welcher IP sie beim DNS-Server auftritt (z.B. wegen VPNs oder NAT).
+Browser-Extensions wissen nicht immer, unter welcher Client-IP sie beim DNS-Server auftauchen (VPN/NAT/etc.).
 
-* **Lösung:** Die Extension sendet im Hintergrund einen "Fake-Request" an eine einzigartige Domain (z.B. `ttip-12345.example.com`).
-* Anschließend durchsucht sie sofort die DNS-Logs nach genau dieser Anfrage.
-* Die Client-IP aus diesem Log-Eintrag wird als die "eigene" IP gespeichert und für alle weiteren Filter genutzt.
+* Die Extension triggert eine DNS-Auflösung für einen eindeutigen Hostnamen (z. B. `ttip-<timestamp>-<random>.example.com`).
+* Anschließend sucht sie in den Technitium Query Logs nach genau diesem Eintrag.
+* Die gefundene `clientIpAddress` wird gecacht und dient als Filter für **deine** Log-Einträge.
 
-### 2. Resource Matching
-Um anzuzeigen, was "auf dieser Seite" geblockt wurde, nutzt die Extension die `performance.getEntriesByType("resource")` API.
+### 2) Resource Matching
 
-* Sie vergleicht die Hostnames aller geladenen Ressourcen der aktuellen Tab-Session mit den `Blocked`-Logs des DNS-Servers.
-* Matching erfolgt per Subdomain-Regel (exakt oder als Subdomain), um Seitenbezug zuverlässig herzustellen.
+Um „Geblockt auf dieser Seite“ zu bestimmen, liest TAC die Hostnames der geladenen Ressourcen über:
+
+* `performance.getEntriesByType('resource')`
+
+Diese Hostnames werden dann mit Domains aus den Technitium **Blocked**-Logeinträgen gematcht (exakt oder als Subdomain).
+
+### 3) Ressourcen-Typ Badges
+
+Jeder `PerformanceResourceTiming`-Eintrag enthält einen `initiatorType` (z. B. `img`, `script`, `css`, `xmlhttprequest`). TAC aggregiert diese pro Domain und zeigt kompakte Tags wie `IMG`, `JS`, `CSS`.
+
+> Hinweis: Wenn eine Ressource so früh geblockt wird, dass der Browser keinen Timing-Eintrag erzeugt, kann für diese Domain ggf. kein Typ-Badge erscheinen.
 
 ---
 

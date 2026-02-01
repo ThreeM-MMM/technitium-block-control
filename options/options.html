@@ -85,6 +85,23 @@
                     </div>
 
                     <div class="legendRow">
+                        <div class="pillStack" aria-hidden="true">
+                            <span class="pill">IMG</span>
+                            <span class="pill">JS</span>
+                            <span class="pill">CSS</span>
+                            <span class="pill">+2</span>
+                        </div>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_type_title">
+                                Ressourcen-Typ
+                            </div>
+                            <div class="legendText" data-i18n="options_legend_type_text">
+                                Zusätzliche Badges zeigen an, welcher Elementtyp zu einer Domain gehört (z.B. Bilder, Scripts, Stylesheets).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
                         <span class="swatch hot"></span>
                         <div>
                             <div class="legendTitle" data-i18n="options_legend_hot_title">
@@ -230,6 +247,20 @@
                 </label>
 
                 <label class="field">
+                    <span class="label" data-i18n="options_label_theme">Theme</span>
+                    <select id="uiTheme">
+                        <option value="auto" data-i18n="options_theme_auto">System (automatisch)</option>
+                        <option value="light" data-i18n="options_theme_light">Light</option>
+                        <option value="gray" data-i18n="options_theme_gray">Gray</option>
+                        <option value="dark" data-i18n="options_theme_dark">Dark</option>
+                    </select>
+                    <span class="help" data-i18n="options_help_theme">
+                        Standardmäßig folgt die Extension dem Browser-Theme (Hell/Dunkel).
+                        Du kannst hier ein Theme erzwingen.
+                    </span>
+                </label>
+
+                <label class="field">
                     <span class="label" data-i18n="options_label_logwindow">Log-Zeitfenster (Sekunden)</span>
                     <input
                         type="number"
@@ -286,6 +317,7 @@
             </footer>
         </div>
 
+        <script src="../common/theme.js"></script>
         <script src="../common/i18n.js"></script>
         <script src="options.js"></script>
     </body>

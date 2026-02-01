@@ -1,6 +1,7 @@
 const state = document.getElementById("state");
 const toggle = document.getElementById("toggle");
 const timerState = document.getElementById("timerState");
+const toolbarSub = document.querySelector(".toolbarSub");
 
 const customMinutesInput = document.getElementById("customMinutes");
 const startCustomBtn = document.getElementById("startCustom");
@@ -12,6 +13,8 @@ const toggleOnlyHits = document.getElementById("toggleOnlyHits");
 const pageStatus = document.getElementById("pageStatus");
 const pageBlockedList = document.getElementById("pageBlockedList");
 const blockedList = document.getElementById("blockedList");
+const themeToggleBtn = document.getElementById("themeToggle");
+
 
 const t = (key, subs) => {
   try {
@@ -20,6 +23,66 @@ const t = (key, subs) => {
     return key;
   }
 };
+
+const THEME_CYCLE = ["light", "gray", "dark"];
+const THEME_ICON = {
+  light: "☀",
+  gray: "☾",
+  dark: "✦",
+};
+
+function nextThemeMode(mode) {
+  const idx = THEME_CYCLE.indexOf(mode);
+  return THEME_CYCLE[(idx + 1 + THEME_CYCLE.length) % THEME_CYCLE.length] || 'light';
+}
+
+function resolvedThemeMode(stored) {
+  if (stored === "light" || stored === "gray" || stored === "dark") return stored;
+  // auto (follow system/browser)
+  try {
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  } catch {
+    return "light";
+  }
+}
+
+async function refreshThemeToggle() {
+  if (!themeToggleBtn) return;
+  try {
+    const data = await chrome.storage.local.get({ uiTheme: 'auto' });
+    const current = resolvedThemeMode(data.uiTheme || 'auto');
+    const next = nextThemeMode(current);
+    // Show the NEXT theme icon (what clicking will switch to)
+    themeToggleBtn.textContent = THEME_ICON[next] || '☀';
+  } catch {
+    // ignore
+  }
+}
+
+async function cycleTheme() {
+  try {
+    const data = await chrome.storage.local.get({ uiTheme: 'auto' });
+    const current = resolvedThemeMode(data.uiTheme || 'auto');
+    const next = nextThemeMode(current);
+
+    await chrome.storage.local.set({ uiTheme: next });
+
+    // Apply immediately in this popup
+    if (window.TAC_THEME && window.TAC_THEME.apply) {
+      window.TAC_THEME.apply(next);
+    } else {
+      document.documentElement.dataset.theme = next;
+    }
+
+    // After switching, show icon for the NEXT theme (the next click action)
+    const after = nextThemeMode(next);
+    themeToggleBtn.textContent = THEME_ICON[after] || '☀';
+  } catch {
+    // ignore
+  }
+}
 
 const LAST_MINUTES_KEY = "lastCustomMinutes";
 const UI_SINCE_LOAD_KEY = "uiSinceLoad";
@@ -53,6 +116,7 @@ function renderTimer(tempUntil) {
 
   if (!tempUntil) {
     timerState.textContent = "";
+    if (toolbarSub) toolbarSub.style.display = "none";
     return;
   }
 
@@ -61,11 +125,13 @@ function renderTimer(tempUntil) {
 
   if (leftMs <= 0) {
     timerState.textContent = "";
+    if (toolbarSub) toolbarSub.style.display = "none";
     return;
   }
 
   const leftMin = Math.ceil(leftMs / 60000);
   timerState.textContent = t("popup_temp_until", [fmtTime(tempUntil), leftMin]);
+  if (toolbarSub) toolbarSub.style.display = "flex";
 }
 
 function clampMinutes(n) {
@@ -94,6 +160,70 @@ function baseDomain(hostname) {
   const parts = h.split(".");
   if (parts.length <= 2) return h;
   return parts.slice(-2).join(".");
+}
+
+// Resource type badges (derived from performance entries)
+const TYPE_LABEL = {
+  img: "IMG",
+  image: "IMG",
+  script: "JS",
+  css: "CSS",
+  link: "LINK",
+  font: "FONT",
+  fetch: "XHR",
+  xmlhttprequest: "XHR",
+  beacon: "BEACON",
+  iframe: "FRAME",
+  frame: "FRAME",
+  audio: "MEDIA",
+  video: "MEDIA",
+  other: "OTHER",
+};
+
+const TYPE_PRIORITY = [
+  "img",
+  "image",
+  "script",
+  "css",
+  "font",
+  "fetch",
+  "xmlhttprequest",
+  "iframe",
+  "frame",
+  "audio",
+  "video",
+  "link",
+  "beacon",
+  "other",
+];
+
+function typeLabelsForDomain(blockedDomain, hostTypesObj) {
+  const out = new Set();
+  for (const [host, types] of Object.entries(hostTypesObj || {})) {
+    if (!hostMatchesBlocked(host, blockedDomain)) continue;
+    for (const t of types || []) {
+      const key = String(t || "other").toLowerCase();
+      out.add(TYPE_LABEL[key] || TYPE_LABEL.other);
+    }
+  }
+
+  // Order by priority of underlying types (stable, predictable)
+  const ordered = [];
+  const seen = new Set();
+  for (const pri of TYPE_PRIORITY) {
+    const label = TYPE_LABEL[pri];
+    if (!label || !out.has(label) || seen.has(label)) continue;
+    ordered.push(label);
+    seen.add(label);
+  }
+  // Any remaining labels (unknown types) at the end
+  for (const label of out) {
+    if (!seen.has(label)) ordered.push(label);
+  }
+
+  // Keep UI compact: show up to 2 labels, then +N
+  if (ordered.length <= 2) return ordered;
+  return [ordered[0], ordered[1], `+${ordered.length - 2}`];
 }
 
 function isRestrictedUrl(url) {
@@ -133,13 +263,20 @@ async function refreshStatus() {
   const res = await send("status");
 
   if (res?.error) {
+    state.classList.remove("status-on", "status-off");
     state.textContent = res.error;
     toggle.style.display = "none";
     return;
   }
 
   const enabled = !!res.enableBlocking;
-  state.textContent = enabled ? t("popup_state_on") : t("popup_state_off");
+  state.classList.toggle("status-on", enabled);
+  state.classList.toggle("status-off", !enabled);
+
+  // Visualize status with an emoji (fallback is still readable as text)
+  // Requested: ✅ for enabled, ⛔ for disabled
+  const emoji = enabled ? "✅" : "⛔";
+  state.textContent = `${emoji} ${enabled ? t("popup_state_on") : t("popup_state_off")}`;
 
   toggle.textContent = enabled ? t("popup_btn_disable") : t("popup_btn_enable");
   toggle.style.display = "inline-block";
@@ -179,18 +316,32 @@ async function collectPageSnapshot(tabId) {
   const [{ result }] = await chrome.scripting.executeScript({
     target: { tabId },
     func: () => {
-      const hosts = new Set();
+      const hostTypes = new Map();
       for (const e of performance.getEntriesByType("resource")) {
         try {
           const u = new URL(e.name, location.href);
-          hosts.add(u.hostname.toLowerCase());
+          const host = u.hostname.toLowerCase();
+          if (!host) continue;
+          const type = String(e.initiatorType || "other").toLowerCase();
+          let set = hostTypes.get(host);
+          if (!set) {
+            set = new Set();
+            hostTypes.set(host, set);
+          }
+          set.add(type);
         } catch {}
+      }
+
+      const hostTypesObj = {};
+      for (const [host, set] of hostTypes.entries()) {
+        hostTypesObj[host] = Array.from(set);
       }
 
       return {
         pageHost: location.hostname.toLowerCase(),
         pageStartEpoch: Date.now() - performance.now(),
-        hosts: Array.from(hosts),
+        hosts: Object.keys(hostTypesObj),
+        hostTypes: hostTypesObj,
       };
     },
   });
@@ -205,6 +356,7 @@ function renderList(
   items,
   pageHost,
   allowedMap,
+  typesByDomain,
   { onAllow, onRemoveAllow, onTempAllow },
 ) {
   container.innerHTML = "";
@@ -239,6 +391,15 @@ function renderList(
       const tag = document.createElement("span");
       tag.className = "tag";
       tag.textContent = t("tag_third_party");
+      count.appendChild(tag);
+    }
+
+    // Resource type badges (IMG/JS/CSS/...) if we can infer them from the tab's resource timings
+    const typeLabels = typesByDomain?.[it.domain] || [];
+    for (const lbl of typeLabels) {
+      const tag = document.createElement("span");
+      tag.className = "tag type";
+      tag.textContent = lbl;
       count.appendChild(tag);
     }
 
@@ -342,6 +503,13 @@ async function refreshAll() {
   const allItems = blockedRes.items || [];
   const pageHosts = snapshot.hosts || [];
 
+  // Precompute resource type badges per blocked domain (if possible)
+  const typesByDomain = {};
+  const hostTypesObj = snapshot.hostTypes || {};
+  for (const it of allItems) {
+    typesByDomain[it.domain] = typeLabelsForDomain(it.domain, hostTypesObj);
+  }
+
   const pageRelevant = allItems.filter((it) =>
     pageHosts.some((h) => hostMatchesBlocked(h, it.domain)),
   );
@@ -355,7 +523,7 @@ async function refreshAll() {
     ? allowStatusRes.allowed || {}
     : {};
 
-  renderList(pageBlockedList, pageRelevant, snapshot.pageHost, allowedMap, {
+  renderList(pageBlockedList, pageRelevant, snapshot.pageHost, allowedMap, typesByDomain, {
     onAllow: (d) =>
       doDomainAction("allowDomain", d).then((ok) => ok && refreshAll()),
     onRemoveAllow: (d) =>
@@ -365,7 +533,7 @@ async function refreshAll() {
   });
 
   if (!toggleOnlyHits.checked) {
-    renderList(blockedList, allItems, snapshot.pageHost, allowedMap, {
+    renderList(blockedList, allItems, snapshot.pageHost, allowedMap, typesByDomain, {
       onAllow: (d) =>
         doDomainAction("allowDomain", d).then((ok) => ok && refreshAll()),
       onRemoveAllow: (d) =>
@@ -397,6 +565,20 @@ toggleOnlyHits.addEventListener("change", async () => {
 (async () => {
   await window.TAC_I18N.init();
   window.TAC_I18N.localizePage();
+
+
+    // Theme toggle button
+    if (themeToggleBtn) {
+      await refreshThemeToggle();
+      themeToggleBtn.addEventListener("click", cycleTheme);
+    }
+
+    // Update icon if theme changes elsewhere
+    if (chrome && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener((changes, area) => {
+        if (area === "local" && changes.uiTheme) refreshThemeToggle();
+      });
+    }
   await loadLastMinutes();
   await loadUiToggles();
   await refreshStatus();

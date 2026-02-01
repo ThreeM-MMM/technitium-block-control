@@ -1,13 +1,140 @@
 :root {
     --bg: #ffffff;
+    --card: #ffffff;
     --text: #111;
     --muted: #666;
     --border: #e6e6e6;
     --soft: #f6f7fb;
     --third: #fff2e6;
+    --thirdText: #7a4b00;
     --allowed: #e9f7ee;
     --allowedBorder: #bfe7c8;
     --allowedText: #1f7a35;
+
+    --tag-border: #dddddd;
+    --type-bg: #eef1f4;
+    --type-border: #d7dbe2;
+    --type-text: #374151;
+
+    --btn-bg: #f7f7f7;
+    --btn-bg-hover: #eeeeee;
+    --btn-border: #cfcfcf;
+    --btn-text: #222;
+
+    /* Status colors */
+    --status-on: #1f7a35;
+    --status-off: #b42318;
+}
+
+/* Auto dark mode (follows system/browser preference) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #0f1115;
+        --card: #121723;
+        --text: #e8eaf0;
+        --muted: #a3a9b7;
+        --border: #2a3242;
+        --soft: #161c2a;
+        --third: #2e251d;
+        --thirdText: #e3b97d;
+        --allowed: #0f2a1a;
+        --allowedBorder: #1b5a34;
+        --allowedText: #6ee28f;
+
+        --tag-border: #2a3242;
+        --type-bg: #101826;
+        --type-border: #2a3242;
+        --type-text: #cbd5e1;
+
+        --btn-bg: #161c2a;
+        --btn-bg-hover: #1b2233;
+        --btn-border: #2a3242;
+        --btn-text: #e8eaf0;
+
+        --status-on: #6ee28f;
+        --status-off: #ff6b6b;
+    }
+}
+
+/* Forced themes override auto */
+[data-theme="dark"] {
+    --bg: #0f1115;
+    --card: #121723;
+    --text: #e8eaf0;
+    --muted: #a3a9b7;
+    --border: #2a3242;
+    --soft: #161c2a;
+    --third: #2e251d;
+    --thirdText: #e3b97d;
+    --allowed: #0f2a1a;
+    --allowedBorder: #1b5a34;
+    --allowedText: #6ee28f;
+
+    --tag-border: #2a3242;
+    --type-bg: #101826;
+    --type-border: #2a3242;
+    --type-text: #cbd5e1;
+
+    --btn-bg: #161c2a;
+    --btn-bg-hover: #1b2233;
+    --btn-border: #2a3242;
+    --btn-text: #e8eaf0;
+
+    --status-on: #6ee28f;
+    --status-off: #ff6b6b;
+}
+
+[data-theme="light"] {
+    --bg: #ffffff;
+    --card: #ffffff;
+    --text: #111;
+    --muted: #666;
+    --border: #e6e6e6;
+    --soft: #f6f7fb;
+    --third: #fff2e6;
+    --thirdText: #7a4b00;
+    --allowed: #e9f7ee;
+    --allowedBorder: #bfe7c8;
+    --allowedText: #1f7a35;
+    --tag-border: #dddddd;
+    --type-bg: #eef1f4;
+    --type-border: #d7dbe2;
+    --type-text: #374151;
+    --btn-bg: #f7f7f7;
+    --btn-bg-hover: #eeeeee;
+    --btn-border: #cfcfcf;
+    --btn-text: #222;
+
+    --status-on: #1f7a35;
+    --status-off: #b42318;
+}
+
+/* Gray theme ("dim") */
+[data-theme="gray"] {
+    --bg: #1b1d21;
+    --card: #23262c;
+    --text: #e6e7eb;
+    --muted: #b0b4be;
+    --border: #363a43;
+    --soft: #2a2e36;
+    --third: #3a2f23;
+    --thirdText: #f0c78a;
+    --allowed: #173222;
+    --allowedBorder: #2b6b44;
+    --allowedText: #7ff0a0;
+
+    --tag-border: #363a43;
+    --type-bg: #2c3038;
+    --type-border: #454b57;
+    --type-text: #d1d5db;
+
+    --btn-bg: #2a2e36;
+    --btn-bg-hover: #313642;
+    --btn-border: #454b57;
+    --btn-text: #e6e7eb;
+
+    --status-on: #7ff0a0;
+    --status-off: #ff7b7b;
 }
 
 * {
@@ -27,11 +154,24 @@ body {
         sans-serif;
     background: var(--bg);
     color: var(--text);
+    position: relative;
 }
 
 h1 {
     margin: 0 0 10px;
     font-size: 20px;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.titleIcon {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
 }
 
 .section {
@@ -40,49 +180,139 @@ h1 {
     padding-top: 12px;
 }
 
-.topRow {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+/* Toolbar (blocking toggle + temporary disable) */
+.toolbar {
+    border: 1px solid var(--border);
+    background: var(--card);
+    border-radius: 14px;
+    padding: 10px;
+    margin: 6px 0 10px;
 }
 
-.statusLine {
-    font-size: 13px;
+.toolbarRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.toolbarStatus {
+    font-size: 12px;
     color: var(--muted);
-    margin: 4px 0 10px;
+    white-space: nowrap;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.toolbarStatus.status-on {
+    color: var(--status-on);
+    font-weight: 600;
+}
+
+.toolbarStatus.status-off {
+    color: var(--status-off);
+    font-weight: 600;
+}
+
+.toolbarActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    /* Keep controls on a single line to avoid layout jitter between ON/OFF */
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+}
+
+.toolbarSub {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 6px;
 }
 
 button {
     padding: 8px 12px;
     border-radius: 10px;
-    border: 1px solid #cfcfcf;
-    background: #fff;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-text);
     cursor: pointer;
+    font-size: 12px;
+    white-space: nowrap;
 }
 
+button:hover {
+    background: var(--btn-bg-hover);
+}
+
+/* Action buttons should look identical to other buttons */
 button.actionBtn {
-    padding: 6px 10px;
-    border-radius: 10px;
+    padding: 8px 12px;
 }
 
-.inputRow {
+/* Minutes input with unit label */
+.minutesWrap {
     display: flex;
-    gap: 10px;
-    align-items: center;
+    align-items: stretch;
 }
 
-input[type="number"] {
+input.minutesInput {
+    /* Keep the minutes field compact (≈3 digits) so the status has more room */
+    width: 3.2em;
+    padding: 8px 6px;
+    border-radius: 10px 0 0 10px;
+    border: 1px solid var(--border);
+    border-right: 0;
+    background: var(--card);
+    color: var(--text);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Keep the compact minutes input truly compact by hiding native spinners */
+input.minutesInput::-webkit-outer-spin-button,
+input.minutesInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input.minutesInput {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.minutesUnit {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+    border: 1px solid var(--border);
+    border-left: 0;
+    border-radius: 0 10px 10px 0;
+    background: var(--card);
+    font-size: 12px;
+    color: var(--muted);
+    user-select: none;
+}
+
+input[type="number"]:not(.minutesInput) {
     width: 110px;
     padding: 8px 10px;
     border-radius: 10px;
-    border: 1px solid #d9d9d9;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
 }
 
 .small {
     font-size: 12px;
     color: var(--muted);
-    margin-top: 6px;
+    margin: 0;
+}
+
+.toolbarSub .small {
+    font-size: 11px;
 }
 
 .headerRow {
@@ -106,7 +336,7 @@ input[type="number"] {
     margin-top: 10px;
     border: 1px solid var(--border);
     border-radius: 12px;
-    background: #fff;
+    background: var(--card);
     overflow: auto;
     padding: 6px;
 }
@@ -161,15 +391,22 @@ input[type="number"] {
     font-size: 11px;
     padding: 1px 6px;
     border-radius: 999px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--tag-border);
     background: var(--third);
-    color: #7a4b00;
+    color: var(--thirdText);
+}
+
+/* Resource type badge (IMG/JS/CSS/...) */
+.tag.type {
+    border-color: var(--type-border);
+    background: var(--type-bg);
+    color: var(--type-text);
 }
 
 /* NEW: Allowed Badge */
 .tag.allowed {
     border-color: var(--allowedBorder);
-    background: #f3fff6;
+    background: color-mix(in srgb, var(--allowed) 75%, var(--card));
     color: var(--allowedText);
     font-weight: 600;
 }
@@ -185,4 +422,63 @@ input[type="number"] {
     padding: 10px;
     font-size: 12px;
     color: var(--muted);
+}
+
+
+/* Theme toggle button (top-right) */
+.themeToggle {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.75);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+}
+
+.themeToggle:hover {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+@media (prefers-color-scheme: dark) {
+    .themeToggle {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.22);
+    }
+    .themeToggle:hover {
+        background: rgba(255, 255, 255, 0.14);
+    }
+}
+
+/* Keep a good contrast in explicit themes */
+[data-theme="dark"] .themeToggle,
+[data-theme="gray"] .themeToggle {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+
+    box-shadow: none;
+}
+[data-theme="dark"] .themeToggle:hover,
+[data-theme="gray"] .themeToggle:hover {
+    background: rgba(255, 255, 255, 0.14);
+}
+
+
+/* Ensure visibility in explicit light theme */
+[data-theme="light"] .themeToggle {
+    border-color: rgba(0, 0, 0, 0.35);
+    background: rgba(0, 0, 0, 0.75);
+}
+[data-theme="light"] .themeToggle:hover {
+    background: rgba(0, 0, 0, 0.85);
 }

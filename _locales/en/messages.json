@@ -29,8 +29,11 @@
   "popup_minutes_aria": {
     "message": "Minutes"
   },
+  "popup_minutes_unit": {
+    "message": "min"
+  },
   "popup_start": {
-    "message": "Start"
+    "message": "Disable blocking for:"
   },
   "popup_temp_disable_help": {
     "message": "Temporarily disable (1–1440 minutes)"
@@ -122,6 +125,12 @@
   "options_legend_third_text": {
     "message": "Domain differs from the site's base domain (tracker/CDN/ads etc.). In the popup, you'll see the <span class=\"pill\">3rd</span> tag."
   },
+  "options_legend_type_title": {
+    "message": "Resource type"
+  },
+  "options_legend_type_text": {
+    "message": "Additional badges indicate the resource type for a domain (e.g. IMG, JS, CSS, XHR, FONT, FRAME, MEDIA). If there are more than two types, the UI shows a compact +N tag. Types are inferred from the current tab's resource timings."
+  },
   "options_legend_hot_title": {
     "message": "\"Hot\" (blocked frequently)"
   },
@@ -206,6 +215,24 @@
   "options_help_language": {
     "message": "By default, the extension uses your browser's UI language. You can override it here."
   },
+  "options_label_theme": {
+    "message": "Theme"
+  },
+  "options_theme_auto": {
+    "message": "System default (auto)"
+  },
+  "options_theme_light": {
+    "message": "Light"
+  },
+  "options_theme_gray": {
+    "message": "Gray"
+  },
+  "options_theme_dark": {
+    "message": "Dark"
+  },
+  "options_help_theme": {
+    "message": "By default, the extension follows your browser theme (light/dark). You can force Light, Gray, or Dark here."
+  },
   "options_label_logwindow": {
     "message": "Log window (seconds)"
   },
@@ -238,5 +265,8 @@
   },
   "popup_generic_error": {
     "message": "Error"
+  },
+  "popup_theme_toggle": {
+    "message": "Switch theme"
   }
 }
