@@ -1,4 +1,6 @@
-# 🛡️ Technitium Adblock Control
+# <img src="icons/icon48.png" alt="Technitium Adblock Control" width="28" /> Technitium Adblock Control
+
+**Sprache:** [English](README.en.md) | **Deutsch**
 
 > Eine leistungsstarke Browser-Extension für Chrome & Vivaldi zur direkten Steuerung der Block-Funktion des [Technitium DNS Servers](https://technitium.com/dns/).
 
@@ -81,7 +83,7 @@ Um anzuzeigen, was "auf dieser Seite" geblockt wurde, nutzt die Extension die `p
 
 ## 🏗️ Tech Stack
 
-* **Manifest V3** Service Worker Architektur.
+* **Manifest V3** Service Worker Architektur
 * **Vanilla JS**
 * **Technitium DNS HTTP API**
 * **Chrome Scripting & Storage API**
