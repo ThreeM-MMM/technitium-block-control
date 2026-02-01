@@ -1,0 +1,242 @@
+{
+  "app_name": {
+    "message": "Technitium Adblock Control"
+  },
+  "popup_doc_title": {
+    "message": "Technitium Adblock Control"
+  },
+  "popup_heading": {
+    "message": "Technitium Adblock Control"
+  },
+  "popup_loading": {
+    "message": "Lade..."
+  },
+  "popup_state_on": {
+    "message": "Adblocking: AKTIV"
+  },
+  "popup_state_off": {
+    "message": "Adblocking: AUS"
+  },
+  "popup_btn_enable": {
+    "message": "Aktivieren"
+  },
+  "popup_btn_disable": {
+    "message": "Deaktivieren"
+  },
+  "popup_minutes_placeholder": {
+    "message": "Minuten"
+  },
+  "popup_minutes_aria": {
+    "message": "Minuten"
+  },
+  "popup_start": {
+    "message": "Start"
+  },
+  "popup_temp_disable_help": {
+    "message": "Temporär deaktivieren (1–1440 Minuten)"
+  },
+  "popup_temp_until": {
+    "message": "Temporär aus bis $1 ($2 min)"
+  },
+  "popup_blocked_on_page": {
+    "message": "Geblockt auf dieser Seite"
+  },
+  "popup_more_blocked": {
+    "message": "Weitere geblockte Domains"
+  },
+  "popup_refresh": {
+    "message": "Refresh"
+  },
+  "popup_toggle_since_load": {
+    "message": "Seit Seitenaufruf"
+  },
+  "popup_toggle_only_hits": {
+    "message": "Nur Seiten-Treffer"
+  },
+  "popup_empty": {
+    "message": "Keine Einträge."
+  },
+  "popup_hidden_only_hits": {
+    "message": "Ausgeblendet (Nur Seiten-Treffer aktiv)"
+  },
+  "popup_page_cannot_analyze": {
+    "message": "Diese Seite kann nicht analysiert werden."
+  },
+  "popup_analysis_not_possible": {
+    "message": "Analyse nicht möglich (Browser-Schutz)."
+  },
+  "popup_error_prefix": {
+    "message": "Fehler: $1"
+  },
+  "tag_third_party": {
+    "message": "3rd"
+  },
+  "btn_allow": {
+    "message": "Allow"
+  },
+  "btn_remove_allow": {
+    "message": "Remove Allow"
+  },
+  "btn_temp_allow": {
+    "message": "Temp Allow"
+  },
+  "options_doc_title": {
+    "message": "Technitium Adblock Control – Einstellungen"
+  },
+  "options_heading": {
+    "message": "Technitium Adblock Control – Einstellungen"
+  },
+  "options_subtitle": {
+    "message": "Diese Extension verbindet deinen Browser mit der Technitium DNS Server API, um DNS-Adblocking clientbasiert zu steuern und geblockte Domains komfortabel zu (temporär) erlauben."
+  },
+  "options_card_what_title": {
+    "message": "Was macht die Extension?"
+  },
+  "options_li_blocking": {
+    "message": "<strong>Adblocking an/aus</strong> (dauerhaft oder zeitgesteuert)."
+  },
+  "options_li_show_blocked": {
+    "message": "<strong>Anzeige geblockter Domains</strong> (aus Technitium Query Logs, gefiltert auf deine Client-IP)."
+  },
+  "options_li_compare_page": {
+    "message": "<strong>Abgleich mit der aktuellen Seite</strong>: zeigt an, welche geblockten Domains zur Seite passen."
+  },
+  "options_li_whitelist": {
+    "message": "<strong>Whitelist per Klick</strong>: Allow / Temp Allow direkt im Popup."
+  },
+  "options_note_query_logs": {
+    "message": "Voraussetzung: In Technitium müssen <strong>Query Logs</strong> aktiviert sein (SQLite)."
+  },
+  "options_card_legend_title": {
+    "message": "Legende & Darstellungsmodi"
+  },
+  "options_legend_first_title": {
+    "message": "First-Party (zur Seite gehörend)"
+  },
+  "options_legend_first_text": {
+    "message": "Domain hat dieselbe Basisdomain wie die aktuell besuchte Seite (Heuristik)."
+  },
+  "options_legend_third_title": {
+    "message": "3rd-Party"
+  },
+  "options_legend_third_text": {
+    "message": "Domain unterscheidet sich von der Basisdomain der Seite (Tracker/CDN/Ads etc.). Im Popup erscheint das Tag <span class=\"pill\">3rd</span>."
+  },
+  "options_legend_hot_title": {
+    "message": "\"Hot\" (häufig geblockt)"
+  },
+  "options_legend_hot_text": {
+    "message": "Linker Marker bedeutet: diese Domain wurde in den Logs sehr oft geblockt (aktuell: ab 20×)."
+  },
+  "options_legend_allowed_title": {
+    "message": "Allowed (bereits erlaubt)"
+  },
+  "options_legend_allowed_text": {
+    "message": "Grün markiert + Badge \"Allowed\": diese Domain ist bereits auf der Allowlist. Im Popup erscheint \"Remove Allow\"."
+  },
+  "options_legend_btn_allow_title": {
+    "message": "Allow"
+  },
+  "options_legend_btn_allow_text": {
+    "message": "Fügt die Domain zur Allowlist hinzu (dauerhaft, je nach Technitium-Konfiguration)."
+  },
+  "options_legend_btn_remove_title": {
+    "message": "Remove Allow"
+  },
+  "options_legend_btn_remove_text": {
+    "message": "Entfernt die Domain aus der Allowlist (Allowed Zones)."
+  },
+  "options_legend_btn_temp_title": {
+    "message": "Temp Allow"
+  },
+  "options_legend_btn_temp_text": {
+    "message": "Erlaubt die Domain temporär (Dauer konfigurierbar in den Optionen)."
+  },
+  "options_legend_since_title": {
+    "message": "Seit Seitenaufruf"
+  },
+  "options_legend_since_text": {
+    "message": "Nutzt nur Log-Einträge seit dem Laden der aktuellen Seite (statt \"letzte X Sekunden\")."
+  },
+  "options_legend_only_title": {
+    "message": "Nur Seiten-Treffer"
+  },
+  "options_legend_only_text": {
+    "message": "Blendet die zweite Liste (\"Weitere geblockte Domains\") aus, damit du dich auf diese Seite fokussierst."
+  },
+  "options_legend_allowstatus_title": {
+    "message": "Allow-Status im Popup"
+  },
+  "options_legend_allowstatus_text": {
+    "message": "Markiert bereits erlaubte Domains (Badge \"Allowed\") und zeigt \"Remove Allow\" statt \"Allow\"."
+  },
+  "options_card_connection_title": {
+    "message": "Verbindung"
+  },
+  "options_label_baseurl": {
+    "message": "Technitium URL"
+  },
+  "options_placeholder_baseurl": {
+    "message": "http://10.10.0.2:5380"
+  },
+  "options_help_baseurl": {
+    "message": "Beispiel: https://dns.example.com oder http://10.10.0.2:5380"
+  },
+  "options_label_apikey": {
+    "message": "API Key"
+  },
+  "options_help_apikey": {
+    "message": "Wird lokal im Browser gespeichert (chrome.storage.local)."
+  },
+  "options_card_display_title": {
+    "message": "Darstellung & Verhalten"
+  },
+  "options_label_language": {
+    "message": "Sprache"
+  },
+  "options_language_system": {
+    "message": "System (automatisch)"
+  },
+  "options_language_de": {
+    "message": "Deutsch"
+  },
+  "options_language_en": {
+    "message": "Englisch"
+  },
+  "options_help_language": {
+    "message": "Standard: nutzt die UI-Sprache des Browsers. Optional kannst du sie hier überschreiben."
+  },
+  "options_label_logwindow": {
+    "message": "Log-Zeitfenster (Sekunden)"
+  },
+  "options_help_logwindow": {
+    "message": "Wie weit zurück die Extension standardmäßig im Query Log sucht (wenn \"Seit Seitenaufruf\" aus ist)."
+  },
+  "options_label_tempallow": {
+    "message": "Temp-Allow Dauer (Minuten)"
+  },
+  "options_help_tempallow": {
+    "message": "Wie lange \"Temp Allow\" eine Domain temporär erlaubt."
+  },
+  "options_label_showallowstatus": {
+    "message": "Allow-Status im Popup anzeigen"
+  },
+  "options_help_showallowstatus": {
+    "message": "Markiert bereits erlaubte Domains (Badge \"Allowed\") und zeigt \"Remove Allow\" statt \"Allow\"."
+  },
+  "options_save": {
+    "message": "Speichern"
+  },
+  "options_saved": {
+    "message": "Gespeichert ✔"
+  },
+  "options_footer_note": {
+    "message": "Hinweis: Diese Extension liest keine Seiteninhalte aus. Für den Seiten-Abgleich werden nur die Hostnames von Netzwerk-Ressourcen (Performance-Einträge) im aktuellen Tab genutzt."
+  },
+  "manifest_description": {
+    "message": "Technitium DNS Adblocking steuern und geblockte Domains pro Seite anzeigen."
+  },
+  "popup_generic_error": {
+    "message": "Fehler"
+  }
+}

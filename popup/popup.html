@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta data-i18n-doc-title="popup_doc_title" />
+        <title>Technitium Adblock Control</title>
+        <link rel="stylesheet" href="popup.css" />
+    </head>
+    <body>
+        <h1 data-i18n="popup_heading">Technitium Adblock Control</h1>
+
+        <div class="statusLine" id="state" data-i18n="popup_loading">Lade...</div>
+
+        <div class="topRow">
+            <button id="toggle" style="display: none">...</button>
+        </div>
+
+        <div class="inputRow" style="margin-top: 10px">
+            <input
+                id="customMinutes"
+                type="number"
+                min="1"
+                max="1440"
+                data-i18n-placeholder="popup_minutes_placeholder"
+                data-i18n-aria-label="popup_minutes_aria"
+                placeholder="Minuten"
+            />
+            <button id="startCustom" data-i18n="popup_start">Start</button>
+        </div>
+        <div class="small" data-i18n="popup_temp_disable_help">
+            Temporär deaktivieren (1–1440 Minuten)
+        </div>
+        <div class="small" id="timerState"></div>
+
+        <div class="section">
+            <div class="headerRow">
+                <div>
+                    <b data-i18n="popup_blocked_on_page">Geblockt auf dieser Seite</b>
+                </div>
+                <button id="refreshAll" data-i18n="popup_refresh">Refresh</button>
+            </div>
+
+            <div class="toggleRow">
+                <label>
+                    <input type="checkbox" id="toggleSinceLoad" />
+                    <span data-i18n="popup_toggle_since_load">Seit Seitenaufruf</span>
+                </label>
+                <label>
+                    <input type="checkbox" id="toggleOnlyHits" />
+                    <span data-i18n="popup_toggle_only_hits">Nur Seiten-Treffer</span>
+                </label>
+            </div>
+
+            <div class="small" id="pageStatus"></div>
+
+            <div class="listBox" id="pageBlockedList">
+                <div class="empty" data-i18n="popup_empty">Keine Einträge.</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <b data-i18n="popup_more_blocked">Weitere geblockte Domains</b>
+            <div class="listBox" id="blockedList">
+                <div class="empty" data-i18n="popup_empty">Keine Einträge.</div>
+            </div>
+        </div>
+
+        <script src="../common/i18n.js"></script>
+        <script src="popup.js"></script>
+    </body>
+</html>

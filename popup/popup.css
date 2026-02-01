@@ -1,0 +1,188 @@
+:root {
+    --bg: #ffffff;
+    --text: #111;
+    --muted: #666;
+    --border: #e6e6e6;
+    --soft: #f6f7fb;
+    --third: #fff2e6;
+    --allowed: #e9f7ee;
+    --allowedBorder: #bfe7c8;
+    --allowedText: #1f7a35;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    width: 560px;
+    padding: 14px;
+    font-family:
+        system-ui,
+        -apple-system,
+        Segoe UI,
+        Roboto,
+        Arial,
+        sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+h1 {
+    margin: 0 0 10px;
+    font-size: 20px;
+}
+
+.section {
+    margin-top: 12px;
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.topRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.statusLine {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 4px 0 10px;
+}
+
+button {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #cfcfcf;
+    background: #fff;
+    cursor: pointer;
+}
+
+button.actionBtn {
+    padding: 6px 10px;
+    border-radius: 10px;
+}
+
+.inputRow {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+input[type="number"] {
+    width: 110px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #d9d9d9;
+}
+
+.small {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggleRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 8px;
+}
+
+/* Basis-Listbox */
+.listBox {
+    margin-top: 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: #fff;
+    overflow: auto;
+    padding: 6px;
+}
+
+/* Obere Liste: darf größer sein */
+#pageBlockedList.listBox {
+    max-height: 300px;
+}
+
+/* Untere Liste: ca. 4 Einträge sichtbar */
+#blockedList.listBox {
+    max-height: 170px;
+}
+
+.rowItem {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    margin: 6px 0;
+    background: var(--soft);
+}
+
+.rowItem.allowed {
+    background: var(--allowed);
+    border-color: var(--allowedBorder);
+}
+
+.rowItem.hot {
+    border-left: 4px solid #ff7a00;
+    padding-left: 8px;
+}
+
+.left .domain {
+    font-size: 13px;
+    font-weight: 600;
+    word-break: break-word;
+}
+
+.left .count {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tag {
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: var(--third);
+    color: #7a4b00;
+}
+
+/* NEW: Allowed Badge */
+.tag.allowed {
+    border-color: var(--allowedBorder);
+    background: #f3fff6;
+    color: var(--allowedText);
+    font-weight: 600;
+}
+
+.btnRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex: 0 0 auto;
+}
+
+.empty {
+    padding: 10px;
+    font-size: 12px;
+    color: var(--muted);
+}

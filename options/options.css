@@ -1,0 +1,241 @@
+:root {
+    --bg: #f6f7fb;
+    --card: #ffffff;
+    --text: #111;
+    --muted: #666;
+    --border: #e6e6e6;
+    --accent: #e9f7ee;
+    --accentBorder: #bfe7c8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family:
+        system-ui,
+        -apple-system,
+        Segoe UI,
+        Roboto,
+        Arial,
+        sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+.wrap {
+    max-width: 980px;
+    margin: 24px auto;
+    padding: 0 18px 40px;
+}
+
+/* ===== Header ===== */
+
+.header {
+    margin-bottom: 20px;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.titleIcon {
+    width: 48px;
+    height: 48px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.subtitle {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* ===== Cards ===== */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 18px 20px;
+    margin: 18px 0;
+}
+
+h2 {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+/* ===== Lists ===== */
+
+.list {
+    margin: 8px 0 10px 18px;
+}
+
+.list li {
+    margin: 6px 0;
+}
+
+.note {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 10px;
+}
+
+/* ===== Legend ===== */
+
+.legend {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.legendRow {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.legendTitle {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.legendText {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 3px;
+}
+
+.swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    flex: 0 0 auto;
+}
+
+.swatch.firstParty {
+    background: #eef6ff;
+}
+
+.swatch.thirdParty {
+    background: #fff2e6;
+}
+
+.swatch.hot {
+    border-left: 4px solid #ff7a00;
+    background: #fff;
+}
+
+.swatch.allowed {
+    background: var(--accent);
+    border: 1px solid var(--accentBorder);
+}
+
+/* Pills / Mock Buttons */
+
+.pill {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    background: #f3f3f3;
+}
+
+.btnMock {
+    padding: 6px 10px;
+    border-radius: 10px;
+    border: 1px solid #cfcfcf;
+    font-size: 12px;
+    background: #fff;
+}
+
+/* ===== Form Fields ===== */
+
+.field {
+    display: block;
+    margin: 14px 0;
+}
+
+.label {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"] {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d9d9d9;
+    font-size: 14px;
+}
+
+select {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #d9d9d9;
+    font-size: 14px;
+    background: #fff;
+}
+
+.help {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.sep {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 14px 0;
+}
+
+/* ===== Actions ===== */
+
+.actions {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+button {
+    padding: 9px 16px;
+    border-radius: 10px;
+    border: 1px solid #cfcfcf;
+    background: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.status {
+    font-size: 13px;
+    color: #2a7a2a;
+}
+
+/* ===== Footer ===== */
+
+.footer {
+    margin-top: 20px;
+}
+
+.footnote {
+    font-size: 12px;
+    color: var(--muted);
+}

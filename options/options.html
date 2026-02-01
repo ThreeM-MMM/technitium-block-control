@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta data-i18n-doc-title="options_doc_title" />
+        <title>Technitium Adblock Control – Settings</title>
+        <link rel="stylesheet" href="options.css" />
+    </head>
+    <body>
+        <div class="wrap">
+            <header class="header">
+                <div class="titleRow">
+                    <img
+                        src="../icons/icon48.png"
+                        class="titleIcon"
+                        alt="Icon"
+                    />
+                    <div>
+                        <h1 data-i18n="options_heading">Technitium Adblock Control – Einstellungen</h1>
+                        <p class="subtitle" data-i18n="options_subtitle">
+                            Diese Extension verbindet deinen Browser mit der
+                            Technitium DNS Server API, um DNS-Adblocking
+                            clientbasiert zu steuern und geblockte Domains
+                            komfortabel zu (temporär) erlauben.
+                        </p>
+                    </div>
+                </div>
+            </header>
+
+            <section class="card">
+                <h2 data-i18n="options_card_what_title">Was macht die Extension?</h2>
+                <ul class="list">
+                    <li data-i18n-html="options_li_blocking">
+                        <strong>Adblocking an/aus</strong> (dauerhaft oder
+                        zeitgesteuert).
+                    </li>
+                    <li data-i18n-html="options_li_show_blocked">
+                        <strong>Anzeige geblockter Domains</strong> (aus
+                        Technitium Query Logs, gefiltert auf deine Client-IP).
+                    </li>
+                    <li data-i18n-html="options_li_compare_page">
+                        <strong>Abgleich mit der aktuellen Seite</strong>: zeigt
+                        an, welche geblockten Domains zur Seite passen.
+                    </li>
+                    <li data-i18n-html="options_li_whitelist">
+                        <strong>Whitelist per Klick</strong>: Allow / Temp Allow
+                        direkt im Popup.
+                    </li>
+                </ul>
+                <p class="note" data-i18n-html="options_note_query_logs">
+                    Voraussetzung: In Technitium müssen
+                    <strong>Query Logs</strong> aktiviert sein (SQLite).
+                </p>
+            </section>
+
+            <section class="card">
+                <h2 data-i18n="options_card_legend_title">Legende & Darstellungsmodi</h2>
+
+                <div class="legend">
+                    <div class="legendRow">
+                        <span class="swatch firstParty"></span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_first_title">
+                                First-Party (zur Seite gehörend)
+                            </div>
+                            <div class="legendText" data-i18n="options_legend_first_text">
+                                Domain hat dieselbe Basisdomain wie die aktuell
+                                besuchte Seite (Heuristik).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="swatch thirdParty"></span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_third_title">3rd-Party</div>
+                            <div class="legendText" data-i18n-html="options_legend_third_text">
+                                Domain unterscheidet sich von der Basisdomain
+                                der Seite (Tracker/CDN/Ads etc.). Im Popup
+                                erscheint das Tag
+                                <span class="pill">3rd</span>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="swatch hot"></span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_hot_title">
+                                „Hot“ (häufig geblockt)
+                            </div>
+                            <div class="legendText" data-i18n="options_legend_hot_text">
+                                Linker Marker bedeutet: diese Domain wurde in
+                                den Logs sehr oft geblockt (aktuell: ab 20×).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="swatch allowed"></span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_allowed_title">
+                                Allowed (bereits erlaubt)
+                            </div>
+                            <div class="legendText" data-i18n-html="options_legend_allowed_text">
+                                Grün markiert + Badge „Allowed“: diese Domain
+                                ist bereits auf der Allowlist. Im Popup
+                                erscheint „Remove Allow“.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="sep" />
+
+                <div class="legend">
+                    <div class="legendRow">
+                        <span class="btnMock" data-i18n="btn_allow">Allow</span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_btn_allow_title">Allow</div>
+                            <div class="legendText" data-i18n="options_legend_btn_allow_text">
+                                Fügt die Domain zur Allowlist hinzu (dauerhaft,
+                                je nach Technitium-Konfiguration).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="btnMock" data-i18n="btn_remove_allow">Remove Allow</span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_btn_remove_title">Remove Allow</div>
+                            <div class="legendText" data-i18n="options_legend_btn_remove_text">
+                                Entfernt die Domain aus der Allowlist (Allowed
+                                Zones).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="btnMock" data-i18n="btn_temp_allow">Temp Allow</span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_btn_temp_title">Temp Allow</div>
+                            <div class="legendText" data-i18n="options_legend_btn_temp_text">
+                                Erlaubt die Domain temporär (Dauer
+                                konfigurierbar in den Optionen).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="pill" data-i18n="popup_toggle_since_load">Seit Seitenaufruf</span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_since_title">Seit Seitenaufruf</div>
+                            <div class="legendText" data-i18n="options_legend_since_text">
+                                Nutzt nur Log-Einträge seit dem Laden der
+                                aktuellen Seite (statt „letzte X Sekunden“).
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="pill" data-i18n="popup_toggle_only_hits">Nur Seiten-Treffer</span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_only_title">Nur Seiten-Treffer</div>
+                            <div class="legendText" data-i18n="options_legend_only_text">
+                                Blendet die zweite Liste („Weitere geblockte
+                                Domains“) aus, damit du dich auf diese Seite
+                                fokussierst.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="legendRow">
+                        <span class="pill" data-i18n="options_legend_allowstatus_title">Allow-Status</span>
+                        <div>
+                            <div class="legendTitle" data-i18n="options_legend_allowstatus_title">Allow-Status im Popup</div>
+                            <div class="legendText" data-i18n="options_legend_allowstatus_text">
+                                Markiert bereits erlaubte Domains (Badge
+                                „Allowed“) und zeigt „Remove Allow“ statt
+                                „Allow“.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <h2 data-i18n="options_card_connection_title">Verbindung</h2>
+
+                <label class="field">
+                    <span class="label" data-i18n="options_label_baseurl">Technitium URL</span>
+                    <input
+                        type="text"
+                        id="baseUrl"
+                        data-i18n-placeholder="options_placeholder_baseurl"
+                        placeholder="http://10.10.0.2:5380"
+                        autocomplete="off"
+                    />
+                    <span class="help" data-i18n="options_help_baseurl"
+                        >Beispiel: https://dns.example.com oder
+                        http://10.10.0.2:5380</span
+                    >
+                </label>
+
+                <label class="field">
+                    <span class="label" data-i18n="options_label_apikey">API Key</span>
+                    <input type="password" id="apiKey" autocomplete="off" />
+                    <span class="help" data-i18n="options_help_apikey"
+                        >Wird lokal im Browser gespeichert
+                        (chrome.storage.local).</span
+                    >
+                </label>
+            </section>
+
+            <section class="card">
+                <h2 data-i18n="options_card_display_title">Darstellung & Verhalten</h2>
+
+                <label class="field">
+                    <span class="label" data-i18n="options_label_language">Sprache</span>
+                    <select id="uiLanguage">
+                        <option value="system" data-i18n="options_language_system">System (automatisch)</option>
+                        <option value="de" data-i18n="options_language_de">Deutsch</option>
+                        <option value="en" data-i18n="options_language_en">English</option>
+                    </select>
+                    <span class="help" data-i18n="options_help_language">
+                        Standardmäßig nutzt die Extension die UI-Sprache deines Browsers.
+                        Du kannst sie hier überschreiben.
+                    </span>
+                </label>
+
+                <label class="field">
+                    <span class="label" data-i18n="options_label_logwindow">Log-Zeitfenster (Sekunden)</span>
+                    <input
+                        type="number"
+                        id="logWindowSeconds"
+                        min="10"
+                        max="3600"
+                        step="10"
+                    />
+                    <span class="help" data-i18n="options_help_logwindow">
+                        Wie weit zurück die Extension standardmäßig im Query Log
+                        sucht (wenn „Seit Seitenaufruf“ aus ist).
+                    </span>
+                </label>
+
+                <label class="field">
+                    <span class="label" data-i18n="options_label_tempallow">Temp-Allow Dauer (Minuten)</span>
+                    <input
+                        type="number"
+                        id="tempAllowMinutes"
+                        min="1"
+                        max="1440"
+                        step="1"
+                    />
+                    <span class="help" data-i18n="options_help_tempallow"
+                        >Wie lange „Temp Allow“ eine Domain temporär
+                        erlaubt.</span
+                    >
+                </label>
+
+                <label class="field">
+                    <span class="label" data-i18n="options_label_showallowstatus">Allow-Status im Popup anzeigen</span>
+                    <label style="display: flex; gap: 8px; align-items: center">
+                        <input type="checkbox" id="showAllowStatus" />
+                        <span class="help" style="margin: 0" data-i18n="options_help_showallowstatus">
+                            Markiert bereits erlaubte Domains (Badge „Allowed“)
+                            und zeigt „Remove Allow“ statt „Allow“.
+                        </span>
+                    </label>
+                </label>
+
+                <div class="actions">
+                    <button id="save" data-i18n="options_save">Speichern</button>
+                    <p id="status" class="status"></p>
+                </div>
+            </section>
+
+            <footer class="footer">
+                <p class="footnote" data-i18n="options_footer_note">
+                    Hinweis: Diese Extension liest keine Seiteninhalte aus. Für
+                    den Seiten-Abgleich werden nur die Hostnames von
+                    Netzwerk-Ressourcen (Performance-Einträge) im aktuellen Tab
+                    genutzt.
+                </p>
+            </footer>
+        </div>
+
+        <script src="../common/i18n.js"></script>
+        <script src="options.js"></script>
+    </body>
+</html>
