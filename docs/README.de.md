@@ -33,7 +33,7 @@ Zur englischen README: [../README.md](../README.md)
 
 ## 🛠️ Installation (Entwicklermodus)
 
-Da die Extension noch nicht im Chrome Web Store verfügbar ist, muss sie manuell installiert werden:
+Zuerst, installiere Query Logs (Sqlite) aus dem Technitium Appstore. Klick auf Apps > Appstore und suche anch Query Logs (Sqlite). Klick install.
 
 1. Klone dieses Repository oder lade es als ZIP herunter und entpacke es.
 2. Öffne deinen Browser (Chrome, Vivaldi, Edge, Brave).
