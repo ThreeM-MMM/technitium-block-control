@@ -49,7 +49,7 @@ Nach der Installation muss die Extension mit deinem Technitium Server verbunden 
 1. Rechtsklick auf das Extension-Icon → **Optionen**.
 2. **Basis-URL:** URL deines Technitium Web-Panels (z. B. `http://192.168.1.10:5380`).
 3. **API Token:**
-   * Im Technitium Web-Panel: `Settings` → `Web Service`.
+   * Im Technitium Web-Panel: `Username` → `Create API Token`.
    * Token/User mit ausreichenden Rechten für Settings, Logs und Allowlist erstellen.
 4. Speichern.
 

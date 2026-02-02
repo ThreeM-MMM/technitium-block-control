@@ -49,7 +49,7 @@ After installing, connect the extension to your Technitium server:
 1. Right-click the extension icon → **Options**.
 2. **Base URL:** The URL of your Technitium web panel (e.g., `http://192.168.1.10:5380`).
 3. **API Token:**
-   * In the Technitium web panel, go to `Settings` → `Web Service`.
+   * In the Technitium web panel, click on your Username → `Create API Token`.
    * Create a token/user with sufficient permissions for settings, logs, and allowlist.
 4. Click **Save**.
 
