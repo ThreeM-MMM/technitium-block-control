@@ -86,6 +86,31 @@ Each `PerformanceResourceTiming` entry includes an `initiatorType` (e.g., `img`,
 
 > Note: If a resource is blocked so early that the browser doesn’t create a timing entry, a type badge may be missing for that domain.
 
+## 🔒 Privacy & Security
+
+**What data does the extension process?**
+
+- The extension reads, in the active tab, only **hostnames of network resources** via the Web Performance API (`performance.getEntriesByType('resource')`).
+- Page content (DOM text, form data, cookies, etc.) is **not** read.
+- In addition, the extension queries **DNS query logs** from your own Technitium server via the Technitium DNS HTTP API to display blocked domains.
+
+**Where is data stored?**
+
+- Configuration (Technitium base URL, API token, UI settings, timer state, temp‑allow rules) is stored only locally in the browser’s `chrome.storage.local`.
+- **No data** is sent to third parties or external services – only to the Technitium DNS server you configured.
+
+**Permissions & access to websites**
+
+- The extension **requires access to all websites in order to read the hostnames of loaded resources and match them with the DNS block logs of your Technitium server. No page contents are read.**
+- This access is used exclusively to:
+  - correlate currently loaded domains/resources with Technitium query logs (“Blocked on this page”),
+  - show the status of blocked/allowed domains in the context of the currently opened page.
+
+**Handling of API tokens**
+
+- The API token for your Technitium server is stored only locally in the browser and is used exclusively for calls to the Technitium DNS HTTP API.
+- It is recommended to use a **dedicated API token** with permissions limited to what is necessary (settings/logs/allowlist), instead of a general admin token.
+
 ---
 
 ## 🏗️ Tech Stack
