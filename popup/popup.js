@@ -468,26 +468,43 @@ async function refreshAll() {
     return;
   }
 
+  let pageTabHost = "";
+  try {
+    pageTabHost = new URL(tab.url).hostname.toLowerCase();
+  } catch {
+    pageTabHost = "";
+  }
+
   let snapshot;
   try {
     snapshot = await collectPageSnapshot(tab.id);
   } catch {
-    pageStatus.textContent = t("popup_analysis_not_possible");
-    pageBlockedList.innerHTML = `<div class="empty">${t("popup_empty")}</div>`;
-    blockedList.innerHTML = `<div class="empty">${t("popup_empty")}</div>`;
-    return;
+    // Auf Fehlerseiten (z.B. chrome-error://...) kann kein Snapshot per Performance API
+    // erstellt werden. Wir fallen dann auf ein minimales Snapshot-Objekt zurück,
+    // nutzen aber weiterhin die Tab-URL für das Domain-Matching.
+    snapshot = {
+      pageHost: pageTabHost,
+      pageStartEpoch: Date.now(),
+      hosts: [],
+      hostTypes: {},
+    };
   }
 
   const sinceLoad = toggleSinceLoad.checked;
 
   let blockedRes;
+  let logWindow = { sinceLoad, startIso: null, endIso: null, seconds: null };
   try {
     if (sinceLoad) {
       const start = new Date(snapshot.pageStartEpoch - 2000).toISOString();
       const end = new Date().toISOString();
+      logWindow.startIso = start;
+      logWindow.endIso = end;
       blockedRes = await send("blockedList", { startIso: start, endIso: end });
     } else {
-      blockedRes = await send("blockedList", { seconds: 120 });
+      const seconds = 120;
+      logWindow.seconds = seconds;
+      blockedRes = await send("blockedList", { seconds });
     }
   } catch (e) {
     blockedRes = { error: e?.message || t("popup_generic_error") };
@@ -510,9 +527,53 @@ async function refreshAll() {
     typesByDomain[it.domain] = typeLabelsForDomain(it.domain, hostTypesObj);
   }
 
-  const pageRelevant = allItems.filter((it) =>
+  // 1) Domains, die zu Ressourcen-Hosts der Seite passen
+  let pageRelevant = allItems.filter((it) =>
     pageHosts.some((h) => hostMatchesBlocked(h, it.domain)),
   );
+
+  // 2) Sicherstellen, dass auch die Haupt-Domain der Seite selbst erfasst wird,
+  //    selbst wenn keine Ressourcen geladen wurden (z.B. bei hart geblockter Startseite).
+  const pageNorm = normalizeDomain(pageTabHost || snapshot.pageHost);
+  if (pageNorm) {
+    const already = new Set(pageRelevant.map((x) => normalizeDomain(x.domain)));
+    for (const it of allItems) {
+      if (already.has(normalizeDomain(it.domain))) continue;
+      if (hostMatchesBlocked(pageNorm, it.domain)) {
+        pageRelevant.push(it);
+        already.add(normalizeDomain(it.domain));
+      }
+    }
+
+    // 3) Falls die Seite selbst geblockt wurde, aber in allItems noch nicht auftaucht
+    //    (z.B. weil nur NXDOMAIN-Top-Level-Query geloggt wurde), prüfen wir explizit
+    //    per Log-Query gegen Technitium und mergen einen synthetischen Eintrag.
+    const existsInAll = allItems.some(
+      (it) => normalizeDomain(it.domain) === pageNorm,
+    );
+    if (!existsInAll) {
+      let extraRes;
+      if (logWindow.sinceLoad && logWindow.startIso && logWindow.endIso) {
+        extraRes = await send("blockedForDomain", {
+          domain: pageNorm,
+          startIso: logWindow.startIso,
+          endIso: logWindow.endIso,
+        });
+      } else {
+        extraRes = await send("blockedForDomain", {
+          domain: pageNorm,
+          seconds: logWindow.seconds || 120,
+        });
+      }
+
+      if (extraRes?.ok && extraRes.item) {
+        allItems.push(extraRes.item);
+        if (!already.has(pageNorm)) {
+          pageRelevant.push(extraRes.item);
+        }
+      }
+    }
+  }
 
   // Allow-Status optional (per option) – wir fragen batch an
   const domainsForCheck = Array.from(new Set(allItems.map((x) => x.domain)));
@@ -523,7 +584,7 @@ async function refreshAll() {
     ? allowStatusRes.allowed || {}
     : {};
 
-  renderList(pageBlockedList, pageRelevant, snapshot.pageHost, allowedMap, typesByDomain, {
+  renderList(pageBlockedList, pageRelevant, pageTabHost || snapshot.pageHost, allowedMap, typesByDomain, {
     onAllow: (d) =>
       doDomainAction("allowDomain", d).then((ok) => ok && refreshAll()),
     onRemoveAllow: (d) =>
@@ -533,7 +594,7 @@ async function refreshAll() {
   });
 
   if (!toggleOnlyHits.checked) {
-    renderList(blockedList, allItems, snapshot.pageHost, allowedMap, typesByDomain, {
+    renderList(blockedList, allItems, pageTabHost || snapshot.pageHost, allowedMap, typesByDomain, {
       onAllow: (d) =>
         doDomainAction("allowDomain", d).then((ok) => ok && refreshAll()),
       onRemoveAllow: (d) =>

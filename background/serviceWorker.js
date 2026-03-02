@@ -264,9 +264,28 @@ function normalizeDomain(qname) {
   return String(qname).trim().toLowerCase().replace(/\.$/, "");
 }
 
+function isBlockedLogEntry(e) {
+  // Heuristik:
+  // - responseType enthält "blocked" (z.B. "Blocked", "CacheBlocked", "UpstreamBlocked")
+  // - oder RCODE deutet auf NXDOMAIN hin (typischer Fall bei NxDomain-Blocking)
+  const rtRaw = e.responseType;
+  const rt =
+    typeof rtRaw === "string" ? rtRaw.toLowerCase() : String(rtRaw || "");
+  const rcRaw = e.rcode || e.RCODE;
+  const rc =
+    typeof rcRaw === "string" ? rcRaw.toLowerCase() : String(rcRaw || "");
+
+  if (rt.includes("blocked")) return true;
+  if (rc.includes("nxdomain")) return true;
+
+  return false;
+}
+
 function aggregateBlocked(entries) {
   const map = new Map(); // domain -> { domain, count, lastSeen }
   for (const e of entries) {
+    if (!isBlockedLogEntry(e)) continue;
+
     const d = normalizeDomain(e.qname);
     if (!d) continue;
 
@@ -284,6 +303,56 @@ function aggregateBlocked(entries) {
     if (b.count !== a.count) return b.count - a.count;
     return a.domain.localeCompare(b.domain);
   });
+}
+
+async function findBlockedForDomain(domain, options = {}) {
+  const dNorm = normalizeDomain(domain);
+  if (!dNorm) return null;
+
+  const ql = await detectQueryLoggerApp();
+
+  let startIso;
+  let endIso;
+
+  if (options.startIso && options.endIso) {
+    startIso = options.startIso;
+    endIso = options.endIso;
+  } else {
+    const secondsDefault = await getOptionNumber(LOG_WINDOW_SECONDS_KEY, 120);
+    const seconds = Math.max(
+      10,
+      Math.floor(options.seconds || secondsDefault),
+    );
+    endIso = new Date().toISOString();
+    startIso = new Date(Date.now() - seconds * 1000).toISOString();
+  }
+
+  const res = await queryLogs({
+    name: ql.name,
+    classPath: ql.classPath,
+    entriesPerPage: 200,
+    descendingOrder: true,
+    startIso,
+    endIso,
+    qname: dNorm,
+  });
+
+  const entries = res.response?.entries || [];
+
+  let count = 0;
+  let lastSeen = null;
+
+  for (const e of entries) {
+    if (normalizeDomain(e.qname) !== dNorm) continue;
+    if (!isBlockedLogEntry(e)) continue;
+    count += 1;
+    const ts = e.timestamp || null;
+    if (ts && (!lastSeen || ts > lastSeen)) lastSeen = ts;
+  }
+
+  if (count === 0) return null;
+
+  return { domain: dNorm, count, lastSeen };
 }
 
 // Heuristik: wenn /allowed/list?domain=X “etwas Sinnvolles” zurückgibt,
@@ -398,7 +467,6 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
       // ===== Blocked list =====
       if (msg.action === "blockedList") {
-        const clientIp = await inferClientIpFromLogs();
         const ql = await detectQueryLoggerApp();
 
         let startIso, endIso;
@@ -426,14 +494,30 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           descendingOrder: true,
           startIso,
           endIso,
-          clientIpAddress: clientIp,
-          responseType: "Blocked",
         });
 
         const entries = res.response?.entries || [];
         const items = aggregateBlocked(entries);
 
         sendResponse({ ok: true, items });
+        return;
+      }
+
+      // ===== Blocked for specific domain =====
+      if (msg.action === "blockedForDomain") {
+        const domain = normalizeDomain(msg.domain);
+        if (!domain) {
+          sendResponse({ ok: true, item: null });
+          return;
+        }
+
+        const item = await findBlockedForDomain(domain, {
+          startIso: msg.startIso,
+          endIso: msg.endIso,
+          seconds: msg.seconds,
+        });
+
+        sendResponse({ ok: true, item });
         return;
       }
 
