@@ -96,8 +96,8 @@ Each `PerformanceResourceTiming` entry includes an `initiatorType` (e.g., `img`,
 
 **Where is data stored?**
 
-- Configuration (Technitium base URL, API token, UI settings, timer state, temp‑allow rules) is stored only locally in the browser’s `chrome.storage.local`.
-- **No data** is sent to third parties or external services – only to the Technitium DNS server you configured.
+- Configuration (Technitium base URL, API token, UI settings, timer state, temp-allow rules) is stored only locally in the browser’s `chrome.storage.local`.
+- **No data** is sent to third parties or external services - only to the Technitium DNS server you configured.
 
 **Permissions & access to websites**
 
@@ -109,7 +109,23 @@ Each `PerformanceResourceTiming` entry includes an `initiatorType` (e.g., `img`,
 **Handling of API tokens**
 
 - The API token for your Technitium server is stored only locally in the browser and is used exclusively for calls to the Technitium DNS HTTP API.
-- It is recommended to use a **dedicated API token** with permissions limited to what is necessary (settings/logs/allowlist), instead of a general admin token.
+- It is recommended to use a **dedicated API token** with permissions limited to what is necessary, instead of a general admin token.
+
+**Recommended Technitium API permissions**
+
+| Area | Read / View | Write / Modify | Delete | Used for |
+|---|---:|---:|---:|---|
+| **Settings** | Yes | Yes | No | Read blocking status, enable/disable blocking, temporary disable |
+| **Logs** | Yes | No | No | Read blocked domains and query logs |
+| **Apps** | Yes | No | No | Detect the Query Logs / Query Logger app via `/api/apps/list` |
+| **Allowed** | Optional | Yes | Yes | Check allow status, add allow, remove allow, clean up temp allow |
+| **Cache** | No | No | Yes | Clear cache entries after allow/remove so changes apply immediately |
+
+**Notes on least-privilege setup**
+
+- **Allowed: Read / View** is only required if you want the extension to detect already allowed domains and show **Remove Allow**.
+- If you do **not** need allow-status detection, you can omit **Allowed: Read / View** and still keep allow/remove functionality.
+- Permissions such as **Dashboard**, **Zones**, **Blocked**, **DnsClient**, **DhcpServer**, or **Administration** are not required for this extension.
 
 ---
 

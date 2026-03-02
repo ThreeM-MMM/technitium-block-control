@@ -15,7 +15,6 @@ const pageBlockedList = document.getElementById("pageBlockedList");
 const blockedList = document.getElementById("blockedList");
 const themeToggleBtn = document.getElementById("themeToggle");
 
-
 const t = (key, subs) => {
   try {
     return window.TAC_I18N ? window.TAC_I18N.t(key, subs) : key;
@@ -33,14 +32,18 @@ const THEME_ICON = {
 
 function nextThemeMode(mode) {
   const idx = THEME_CYCLE.indexOf(mode);
-  return THEME_CYCLE[(idx + 1 + THEME_CYCLE.length) % THEME_CYCLE.length] || 'light';
+  return (
+    THEME_CYCLE[(idx + 1 + THEME_CYCLE.length) % THEME_CYCLE.length] || "light"
+  );
 }
 
 function resolvedThemeMode(stored) {
-  if (stored === "light" || stored === "gray" || stored === "dark") return stored;
+  if (stored === "light" || stored === "gray" || stored === "dark")
+    return stored;
   // auto (follow system/browser)
   try {
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+    return window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
   } catch {
@@ -51,11 +54,11 @@ function resolvedThemeMode(stored) {
 async function refreshThemeToggle() {
   if (!themeToggleBtn) return;
   try {
-    const data = await chrome.storage.local.get({ uiTheme: 'auto' });
-    const current = resolvedThemeMode(data.uiTheme || 'auto');
+    const data = await chrome.storage.local.get({ uiTheme: "auto" });
+    const current = resolvedThemeMode(data.uiTheme || "auto");
     const next = nextThemeMode(current);
     // Show the NEXT theme icon (what clicking will switch to)
-    themeToggleBtn.textContent = THEME_ICON[next] || '☀';
+    themeToggleBtn.textContent = THEME_ICON[next] || "☀";
   } catch {
     // ignore
   }
@@ -63,8 +66,8 @@ async function refreshThemeToggle() {
 
 async function cycleTheme() {
   try {
-    const data = await chrome.storage.local.get({ uiTheme: 'auto' });
-    const current = resolvedThemeMode(data.uiTheme || 'auto');
+    const data = await chrome.storage.local.get({ uiTheme: "auto" });
+    const current = resolvedThemeMode(data.uiTheme || "auto");
     const next = nextThemeMode(current);
 
     await chrome.storage.local.set({ uiTheme: next });
@@ -78,7 +81,7 @@ async function cycleTheme() {
 
     // After switching, show icon for the NEXT theme (the next click action)
     const after = nextThemeMode(next);
-    themeToggleBtn.textContent = THEME_ICON[after] || '☀';
+    themeToggleBtn.textContent = THEME_ICON[after] || "☀";
   } catch {
     // ignore
   }
@@ -237,6 +240,7 @@ function isRestrictedUrl(url) {
   return (
     u.startsWith("chrome://") ||
     u.startsWith("chrome-extension://") ||
+    u.startsWith("moz-extension://") ||
     u.startsWith("vivaldi://") ||
     u.startsWith("edge://") ||
     u.startsWith("brave://") ||
@@ -584,24 +588,40 @@ async function refreshAll() {
     ? allowStatusRes.allowed || {}
     : {};
 
-  renderList(pageBlockedList, pageRelevant, pageTabHost || snapshot.pageHost, allowedMap, typesByDomain, {
-    onAllow: (d) =>
-      doDomainAction("allowDomain", d).then((ok) => ok && refreshAll()),
-    onRemoveAllow: (d) =>
-      doDomainAction("removeAllowDomain", d).then((ok) => ok && refreshAll()),
-    onTempAllow: (d) =>
-      doDomainAction("tempAllowDomain", d).then((ok) => ok && refreshAll()),
-  });
-
-  if (!toggleOnlyHits.checked) {
-    renderList(blockedList, allItems, pageTabHost || snapshot.pageHost, allowedMap, typesByDomain, {
+  renderList(
+    pageBlockedList,
+    pageRelevant,
+    pageTabHost || snapshot.pageHost,
+    allowedMap,
+    typesByDomain,
+    {
       onAllow: (d) =>
         doDomainAction("allowDomain", d).then((ok) => ok && refreshAll()),
       onRemoveAllow: (d) =>
         doDomainAction("removeAllowDomain", d).then((ok) => ok && refreshAll()),
       onTempAllow: (d) =>
         doDomainAction("tempAllowDomain", d).then((ok) => ok && refreshAll()),
-    });
+    },
+  );
+
+  if (!toggleOnlyHits.checked) {
+    renderList(
+      blockedList,
+      allItems,
+      pageTabHost || snapshot.pageHost,
+      allowedMap,
+      typesByDomain,
+      {
+        onAllow: (d) =>
+          doDomainAction("allowDomain", d).then((ok) => ok && refreshAll()),
+        onRemoveAllow: (d) =>
+          doDomainAction("removeAllowDomain", d).then(
+            (ok) => ok && refreshAll(),
+          ),
+        onTempAllow: (d) =>
+          doDomainAction("tempAllowDomain", d).then((ok) => ok && refreshAll()),
+      },
+    );
   } else {
     blockedList.innerHTML = `<div class="empty">${t("popup_hidden_only_hits")}</div>`;
   }
@@ -627,19 +647,18 @@ toggleOnlyHits.addEventListener("change", async () => {
   await window.TAC_I18N.init();
   window.TAC_I18N.localizePage();
 
+  // Theme toggle button
+  if (themeToggleBtn) {
+    await refreshThemeToggle();
+    themeToggleBtn.addEventListener("click", cycleTheme);
+  }
 
-    // Theme toggle button
-    if (themeToggleBtn) {
-      await refreshThemeToggle();
-      themeToggleBtn.addEventListener("click", cycleTheme);
-    }
-
-    // Update icon if theme changes elsewhere
-    if (chrome && chrome.storage && chrome.storage.onChanged) {
-      chrome.storage.onChanged.addListener((changes, area) => {
-        if (area === "local" && changes.uiTheme) refreshThemeToggle();
-      });
-    }
+  // Update icon if theme changes elsewhere
+  if (chrome && chrome.storage && chrome.storage.onChanged) {
+    chrome.storage.onChanged.addListener((changes, area) => {
+      if (area === "local" && changes.uiTheme) refreshThemeToggle();
+    });
+  }
   await loadLastMinutes();
   await loadUiToggles();
   await refreshStatus();

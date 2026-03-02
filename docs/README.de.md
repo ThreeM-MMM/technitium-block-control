@@ -91,26 +91,42 @@ Jeder `PerformanceResourceTiming`-Eintrag enthält einen `initiatorType` (z. B. 
 
 **Welche Daten verarbeitet die Extension?**
 
-- Die Extension liest im aktiven Tab nur **Hostnames von Netzwerk‑Ressourcen** über die Web‑Performance‑API (`performance.getEntriesByType('resource')`).
-- Inhalt der Webseite (DOM‑Text, Formulare, Cookies etc.) wird **nicht** ausgelesen.
-- Zusätzlich werden über die Technitium DNS HTTP API **Query‑Logs** deines eigenen Technitium‑Servers abgefragt, um geblockte Domains anzuzeigen.
+- Die Extension liest im aktiven Tab nur **Hostnames von Netzwerk-Ressourcen** über die Web-Performance-API (`performance.getEntriesByType('resource')`).
+- Inhalt der Webseite (DOM-Text, Formulare, Cookies etc.) wird **nicht** ausgelesen.
+- Zusätzlich werden über die Technitium DNS HTTP API **Query-Logs** deines eigenen Technitium-Servers abgefragt, um geblockte Domains anzuzeigen.
 
 **Wo werden Daten gespeichert?**
 
-- Die Konfiguration (Basis‑URL deines Technitium‑Servers, API‑Token, UI‑Einstellungen, Timer‑Status, Temp‑Allow‑Regeln) wird ausschließlich lokal in `chrome.storage.local` des Browsers gespeichert.
-- Es werden **keine Daten** an Dritte oder fremde Server übertragen – nur an den von dir konfigurierten Technitium‑DNS‑Server.
+- Die Konfiguration (Basis-URL deines Technitium-Servers, API-Token, UI-Einstellungen, Timer-Status, Temp-Allow-Regeln) wird ausschließlich lokal in `chrome.storage.local` des Browsers gespeichert.
+- Es werden **keine Daten** an Dritte oder fremde Server übertragen - nur an den von dir konfigurierten Technitium-DNS-Server.
 
 **Berechtigungen & Zugriff auf Websites**
 
-- Die Extension **benötigt Zugriff auf alle Websites, um die Hostnames geladener Ressourcen zu lesen und sie mit den DNS‑Blocklogs deines Technitium‑Servers abzugleichen. Es werden keine Seiteninhalte gelesen.**
+- Die Extension **benötigt Zugriff auf alle Websites, um die Hostnames geladener Ressourcen zu lesen und sie mit den DNS-Blocklogs deines Technitium-Servers abzugleichen. Es werden keine Seiteninhalte gelesen.**
 - Der Zugriff wird ausschließlich dafür verwendet, um:
-  - die aktuell geladenen Domains/Ressourcen mit den Technitium‑Query‑Logs abzugleichen („Geblockt auf dieser Seite“),
+  - die aktuell geladenen Domains/Ressourcen mit den Technitium-Query-Logs abzugleichen („Geblockt auf dieser Seite“),
   - den Status von geblockten/erlaubten Domains im Kontext der geöffneten Seite anzuzeigen.
 
-**Umgang mit API‑Token**
+**Umgang mit API-Token**
 
-- Der API‑Token für den Technitium‑Server wird nur lokal im Browser gespeichert und ausschließlich für Aufrufe zur Technitium DNS HTTP API verwendet.
-- Empfohlen wird die Verwendung eines **dedizierten API‑Tokens** mit auf das Nötigste beschränkten Rechten (Settings/Logs/Allowlist), statt eines allgemeinen Admin‑Tokens.
+- Der API-Token für den Technitium-Server wird nur lokal im Browser gespeichert und ausschließlich für Aufrufe zur Technitium DNS HTTP API verwendet.
+- Empfohlen wird die Verwendung eines **dedizierten API-Tokens** mit auf das Nötigste beschränkten Rechten statt eines allgemeinen Admin-Tokens.
+
+**Empfohlene Technitium-API-Berechtigungen**
+
+| Bereich | Lesen / View | Schreiben / Modify | Löschen / Delete | Verwendet für |
+|---|---:|---:|---:|---|
+| **Settings** | Ja | Ja | Nein | Blocking-Status lesen, Blocking ein-/ausschalten, temporär deaktivieren |
+| **Logs** | Ja | Nein | Nein | Geblockte Domains und Query-Logs lesen |
+| **Apps** | Ja | Nein | Nein | Query Logs / Query Logger App über `/api/apps/list` erkennen |
+| **Allowed** | Optional | Ja | Ja | Allow-Status prüfen, Allow setzen, Allow entfernen, Temp-Allow aufräumen |
+| **Cache** | Nein | Nein | Ja | Cache-Einträge nach Allow/Remove löschen, damit Änderungen sofort greifen |
+
+**Hinweise zum Least-Privilege-Setup**
+
+- **Allowed: Lesen / View** ist nur erforderlich, wenn die Extension bereits erlaubte Domains erkennen und **Remove Allow** anzeigen soll.
+- Wenn du die Allow-Status-Erkennung **nicht** benötigst, kannst du **Allowed: Lesen / View** weglassen und trotzdem Allow/Remove weiter nutzen.
+- Rechte wie **Dashboard**, **Zones**, **Blocked**, **DnsClient**, **DhcpServer** oder **Administration** werden für diese Extension nicht benötigt.
 
 ---
 
