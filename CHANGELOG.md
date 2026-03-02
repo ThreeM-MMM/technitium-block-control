@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on **Keep a Changelog**, and this project follows **Semantic Versioning** where possible.
 
+## [0.3.1] - 2026-03-02
+### Fixed
+- Blocked main domains (including NxDomain cases) now reliably appear in the popup, even when the browser shows an internal error page instead of the original site.
+
+### Changed
+- Improved blocked-entry detection in the background service worker:
+  - A log entry is considered blocked if its `responseType` indicates a blocked response (e.g. `Blocked`, `CacheBlocked`, `UpstreamBlocked`) or if the DNS `RCODE` corresponds to `NxDomain`.
+- The global blocked list (`blockedList` action) once again filters by the current client IP address (based on the “Magic IP” trick), so only queries from the active client are shown in multi-client setups.
+- The domain-specific fallback query (`blockedForDomain` action) intentionally does **not** filter by client IP to robustly catch blocked/NxDomain entries for the active tab’s domain, even in environments where the logged client IP does not exactly match the detected one.
+- The popup now falls back to the tab URL’s hostname when a performance snapshot cannot be created (e.g. on error pages), ensuring correct domain matching for blocked main domains.
+
 ## [0.3.0] - 2026-02-01
 ### Added
 - Theme toggle button in the popup (top-right) to quickly switch themes.
