@@ -335,6 +335,10 @@ async function findBlockedForDomain(domain, options = {}) {
     startIso,
     endIso,
     qname: dNorm,
+    // Absichtlich KEIN clientIpAddress-Filter hier:
+    // findBlockedForDomain dient als robuste Fallback-Abfrage für genau diese Domain,
+    // auch in Umgebungen, in denen die vom Query-Logger geloggte Client-IP nicht
+    // exakt mit der via inferClientIpFromLogs ermittelten IP übereinstimmt.
   });
 
   const entries = res.response?.entries || [];
@@ -467,6 +471,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
       // ===== Blocked list =====
       if (msg.action === "blockedList") {
+        // Wichtig: Wir filtern die Block-Liste nach der Client-IP, damit
+        // nur Anfragen des aktuellen Clients angezeigt werden (Multi-Client-Setup).
+        // Die Client-IP wird über inferClientIpFromLogs() per "Magic IP"-Trick
+        // gegen den Query-Logger ermittelt.
+        const clientIp = await inferClientIpFromLogs();
+
         const ql = await detectQueryLoggerApp();
 
         let startIso, endIso;
@@ -494,6 +504,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           descendingOrder: true,
           startIso,
           endIso,
+          clientIpAddress: clientIp,
         });
 
         const entries = res.response?.entries || [];
