@@ -4,7 +4,7 @@ Deutsch: [docs/README.de.md](docs/README.de.md)
 
 > A powerful browser extension for Chrome & Vivaldi to control the blocking feature of the [Technitium DNS Server](https://technitium.com/dns/).
 
-![Version](https://img.shields.io/badge/version-0.3.1-blue.svg) ![Manifest](https://img.shields.io/badge/manifest-V3-success.svg) ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![Version](https://img.shields.io/badge/version-0.3.2-blue.svg) ![Manifest](https://img.shields.io/badge/manifest-V3-success.svg) ![License](https://img.shields.io/badge/License-GPLv3-blue.svg)
 
 **Technitium Adblock Control (TAC)** connects your browser live to your Technitium DNS server. It lets you control DNS blocking globally, inspect query logs in real time, and allow blocked domains in the context of the currently open webpage.
 
