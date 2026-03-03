@@ -1,4 +1,5 @@
 // background/serviceWorker.js
+// Dieses Skript läuft im Hintergrund und steuert die Kernlogik der Extension.
 
 import {
   getDnsSettings,
@@ -16,26 +17,24 @@ const TIMER_ALARM = "reEnableBlocking";
 
 const CLIENT_IP_CACHE_KEY = "clientIpAddress";
 const CLIENT_IP_CACHE_TS_KEY = "clientIpDetectedAt";
-const QUERY_LOGGER_CACHE_KEY = "queryLoggerApp"; // { name, classPath }
-const CLIENT_IP_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+const QUERY_LOGGER_CACHE_KEY = "queryLoggerApp"; // Zwischenspeicher für die Query Logger App { name, classPath }
+const CLIENT_IP_TTL_MS = 24 * 60 * 60 * 1000; // 24 Stunden
 
 const TEMP_ALLOW_MINUTES_KEY = "tempAllowMinutes";
 const LOG_WINDOW_SECONDS_KEY = "logWindowSeconds";
-const SHOW_ALLOW_STATUS_KEY = "showAllowStatus";
 
-const TEMP_ALLOW_PREFIX = "tempAllow::";
-const TEMP_ALLOW_STATE_KEY = "tempAllowState"; // { [domain]: expiresTs }
+const TEMP_ALLOW_PREFIX = "tempAllow::"; // Präfix für Alarme zur temporären Freigabe
+const TEMP_ALLOW_STATE_KEY = "tempAllowState"; // Speicherschlüssel für den Zustand der temporären Freigaben: { [domain]: expiresTs }
 
-// Rehydrate alarms after browser restart / extension reload.
-// MV3 service workers are ephemeral; relying on in-memory state or persisted alarms alone is brittle.
-// We therefore restore timer/Temp-Allow alarms from chrome.storage.local.
+// Stellt geplante Zustände (Alarme) nach einem Browser-Neustart oder einer Neuinstallation der Extension wieder her.
+// Service Worker in MV3 sind nicht persistent; sich allein auf den In-Memory-Zustand oder gespeicherte Alarme zu verlassen, ist fehleranfällig.
+// Daher stellen wir Timer- und Temp-Allow-Alarme aus chrome.storage.local wieder her.
 async function restoreScheduledState() {
   const now = Date.now();
 
-  // 1) Temporary blocking disable timer
-  const { blockingTempUntil } = await chrome.storage.local.get(
-    "blockingTempUntil",
-  );
+  // 1) Wiederherstellung des Timers für die temporäre Deaktivierung des Blockings
+  const { blockingTempUntil } =
+    await chrome.storage.local.get("blockingTempUntil");
 
   await chrome.alarms.clear(TIMER_ALARM);
   if (blockingTempUntil && Number.isFinite(blockingTempUntil)) {
@@ -46,7 +45,7 @@ async function restoreScheduledState() {
     }
   }
 
-  // 2) Temp-Allow per domain
+  // 2) Wiederherstellung der temporären Freigaben für einzelne Domains
   const state = await getTempAllowState();
   const entries = Object.entries(state);
   if (entries.length === 0) return;
@@ -54,7 +53,7 @@ async function restoreScheduledState() {
   for (const [domain, expiresTs] of entries) {
     const when = Number(expiresTs);
     if (!Number.isFinite(when)) {
-      // Corrupt entry → drop it
+      // Beschädigter Eintrag -> wird entfernt
       delete state[domain];
       continue;
     }
@@ -63,12 +62,16 @@ async function restoreScheduledState() {
     await chrome.alarms.clear(alarmName);
 
     if (when <= now) {
-      // Expired while the extension was not running → cleanup now.
+      // Abgelaufen, während die Extension nicht lief -> jetzt aufräumen.
       try {
         await removeTempAllow(domain);
         delete state[domain];
       } catch (e) {
-        console.warn("[Technitium] Temp allow cleanup (startup) failed:", domain, e);
+        console.warn(
+          "[Technitium] Temp allow cleanup (startup) failed:",
+          domain,
+          e,
+        );
       }
       continue;
     }
@@ -76,7 +79,7 @@ async function restoreScheduledState() {
     await chrome.alarms.create(alarmName, { when });
   }
 
-  // Persist any cleanup we did above.
+  // Alle Aufräumarbeiten, die oben durchgeführt wurden, jetzt speichern.
   await setTempAllowState(state);
 }
 
@@ -88,8 +91,8 @@ async function clearTimerState() {
   await chrome.storage.local.remove(["blockingTempUntil"]);
 }
 
-// --- Temp Allow state helpers ---
-// Temp Allow = wir fügen Domain in allowedZones ein und löschen später wieder
+// --- Hilfsfunktionen für den Temp-Allow-Zustand ---
+// Temp Allow = wir fügen eine Domain zu den "Allowed Zones" hinzu und entfernen sie später wieder.
 async function getTempAllowState() {
   const data = await chrome.storage.local.get(TEMP_ALLOW_STATE_KEY);
   return data[TEMP_ALLOW_STATE_KEY] || {};
@@ -110,7 +113,7 @@ async function removeTempAllow(domain) {
   await setTempAllowState(state);
 }
 
-// Restore alarms/state after install, update, or browser restart.
+// Stellt Alarme/Zustände nach Installation, Update oder Browser-Neustart wieder her.
 chrome.runtime.onInstalled.addListener(() => {
   restoreScheduledState().catch((e) =>
     console.warn("[Technitium] restoreScheduledState (onInstalled) failed:", e),
@@ -123,7 +126,7 @@ chrome.runtime.onStartup.addListener(() => {
   );
 });
 
-// --- Alarms ---
+// --- Alarm-Listener ---
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   if (alarm.name === TIMER_ALARM) {
     try {
@@ -215,8 +218,8 @@ async function setCachedClientIp(ip) {
   });
 }
 
-// Trick: wir erzeugen eine "fake" Web-Request, damit der DNS Server das loggt,
-// dann suchen wir diese qname in logs/query und lesen clientIpAddress.
+// Trick: Wir erzeugen eine "fake" Web-Anfrage, damit der DNS-Server sie protokolliert.
+// Anschließend suchen wir nach diesem qname in den `logs/query`-Ergebnissen und extrahieren die `clientIpAddress`.
 async function inferClientIpFromLogs() {
   const cached = await getCachedClientIp();
   if (cached) return cached;
@@ -265,9 +268,9 @@ function normalizeDomain(qname) {
 }
 
 function isBlockedLogEntry(e) {
-  // Heuristik:
-  // - responseType enthält "blocked" (z.B. "Blocked", "CacheBlocked", "UpstreamBlocked")
-  // - oder RCODE deutet auf NXDOMAIN hin (typischer Fall bei NxDomain-Blocking)
+  // Heuristik zur Erkennung, ob ein Log-Eintrag einen geblockten Request darstellt:
+  // - Der `responseType` enthält "blocked" (z.B. "Blocked", "CacheBlocked", "UpstreamBlocked").
+  // - Oder der `RCODE` deutet auf `NXDOMAIN` hin (typisch für NXDOMAIN-Blocking).
   const rtRaw = e.responseType;
   const rt =
     typeof rtRaw === "string" ? rtRaw.toLowerCase() : String(rtRaw || "");
@@ -319,10 +322,7 @@ async function findBlockedForDomain(domain, options = {}) {
     endIso = options.endIso;
   } else {
     const secondsDefault = await getOptionNumber(LOG_WINDOW_SECONDS_KEY, 120);
-    const seconds = Math.max(
-      10,
-      Math.floor(options.seconds || secondsDefault),
-    );
+    const seconds = Math.max(10, Math.floor(options.seconds || secondsDefault));
     endIso = new Date().toISOString();
     startIso = new Date(Date.now() - seconds * 1000).toISOString();
   }
@@ -335,10 +335,10 @@ async function findBlockedForDomain(domain, options = {}) {
     startIso,
     endIso,
     qname: dNorm,
-    // Absichtlich KEIN clientIpAddress-Filter hier:
-    // findBlockedForDomain dient als robuste Fallback-Abfrage für genau diese Domain,
-    // auch in Umgebungen, in denen die vom Query-Logger geloggte Client-IP nicht
-    // exakt mit der via inferClientIpFromLogs ermittelten IP übereinstimmt.
+    // Hier wird absichtlich KEIN `clientIpAddress`-Filter verwendet.
+    // `findBlockedForDomain` dient als robuste Fallback-Abfrage für eine spezifische Domain,
+    // auch in Umgebungen, in denen die vom Query-Logger protokollierte Client-IP nicht
+    // exakt mit der über `inferClientIpFromLogs` ermittelten IP übereinstimmt.
   });
 
   const entries = res.response?.entries || [];
@@ -359,8 +359,8 @@ async function findBlockedForDomain(domain, options = {}) {
   return { domain: dNorm, count, lastSeen };
 }
 
-// Heuristik: wenn /allowed/list?domain=X “etwas Sinnvolles” zurückgibt,
-// betrachten wir X als “allowed”.
+// Heuristik: Wenn `/allowed/list?domain=X` ein sinnvolles Ergebnis zurückgibt,
+// betrachten wir X als "erlaubt".
 async function isDomainAllowed(domain) {
   const d = normalizeDomain(domain);
   if (!d) return false;
@@ -368,12 +368,12 @@ async function isDomainAllowed(domain) {
   const res = await listAllowed(d);
   const r = res.response || {};
 
-  // In vielen Setups liefert allowed/list für eine existierende Allowed-Zone Records (SOA/NS etc.)
-  // Wenn es NICHT existiert, kommt häufig domain=root/leer oder records leer.
+  // In vielen Konfigurationen liefert `allowed/list` für eine existierende Allowed-Zone Records (z.B. SOA/NS).
+  // Wenn sie nicht existiert, ist die Antwort oft `domain=root` oder `records` ist leer.
   const records = Array.isArray(r.records) ? r.records : [];
   const zones = Array.isArray(r.zones) ? r.zones : [];
 
-  // Robust: erlaubt, wenn entweder records oder zones vorhanden sind UND domain passt (best effort).
+  // Robuste Prüfung: "erlaubt", wenn entweder `records` oder `zones` vorhanden sind UND der Domain-Name (annähernd) passt.
   if (
     (records.length > 0 || zones.length > 0) &&
     String(r.domain || "")
@@ -383,15 +383,12 @@ async function isDomainAllowed(domain) {
     return true;
   }
 
-  // Fallback: wenn records/zones nicht leer sind (best effort)
+  // Fallback: Wenn `records` oder `zones` nicht leer sind, nehmen wir an, die Domain ist erlaubt.
   return records.length > 0 || zones.length > 0;
 }
 
-// Batch-Check mit kleiner Parallelität
+// Führt eine Batch-Überprüfung für mehrere Domains mit begrenzter Parallelität durch.
 async function allowedStatusBatch(domains) {
-  const show = await getOptionBool(SHOW_ALLOW_STATUS_KEY, false);
-  if (!show) return { enabled: false, allowed: {} };
-
   const list = (domains || []).map(normalizeDomain).filter(Boolean);
   const unique = Array.from(new Set(list));
 
@@ -420,7 +417,8 @@ async function allowedStatusBatch(domains) {
   return { enabled: true, allowed };
 }
 
-// ===== Messages =====
+// ===== Nachrichten-Listener =====
+// Behandelt eingehende Nachrichten von anderen Teilen der Extension (z.B. dem Popup).
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   (async () => {
     try {
@@ -469,11 +467,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return;
       }
 
-      // ===== Blocked list =====
+      // ===== Liste der geblockten Domains abrufen =====
       if (msg.action === "blockedList") {
-        // Wichtig: Wir filtern die Block-Liste nach der Client-IP, damit
-        // nur Anfragen des aktuellen Clients angezeigt werden (Multi-Client-Setup).
-        // Die Client-IP wird über inferClientIpFromLogs() per "Magic IP"-Trick
+        // Wichtig: Wir filtern die Block-Liste nach der Client-IP,
+        // damit in Multi-Client-Umgebungen nur die Anfragen des aktuellen Geräts angezeigt werden.
+        // Die Client-IP wird über `inferClientIpFromLogs()` per "Magic IP"-Trick
         // gegen den Query-Logger ermittelt.
         const clientIp = await inferClientIpFromLogs();
 
@@ -514,7 +512,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return;
       }
 
-      // ===== Blocked for specific domain =====
+      // ===== Geblockte Einträge für eine spezifische Domain abrufen =====
       if (msg.action === "blockedForDomain") {
         const domain = normalizeDomain(msg.domain);
         if (!domain) {
@@ -532,7 +530,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return;
       }
 
-      // ===== Allow (permanent) =====
+      // ===== Domain dauerhaft erlauben =====
       if (msg.action === "allowDomain") {
         const domain = normalizeDomain(msg.domain);
         if (!domain) {
@@ -549,7 +547,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return;
       }
 
-      // ===== Remove Allow (permanent) =====
+      // ===== Dauerhafte Freigabe entfernen =====
       if (msg.action === "removeAllowDomain") {
         const domain = normalizeDomain(msg.domain);
         if (!domain) {
@@ -566,7 +564,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return;
       }
 
-      // ===== Temp Allow =====
+      // ===== Domain temporär erlauben =====
       if (msg.action === "tempAllowDomain") {
         const domain = normalizeDomain(msg.domain);
         if (!domain) {
@@ -599,7 +597,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return;
       }
 
-      // ===== Allow status batch =====
+      // ===== Batch-Prüfung des Allow-Status =====
       if (msg.action === "allowedStatusBatch") {
         const domains = Array.isArray(msg.domains) ? msg.domains : [];
         const res = await allowedStatusBatch(domains);

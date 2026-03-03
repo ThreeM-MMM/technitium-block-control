@@ -45,32 +45,32 @@
   }
 
   function localizePage(root = document) {
-    // textContent
+    // Übersetzt das `textContent`-Attribut von Elementen.
     root.querySelectorAll("[data-i18n]").forEach((el) => {
       el.textContent = t(el.dataset.i18n);
     });
 
-    // innerHTML (use sparingly for trusted strings)
+    // Übersetzt das `innerHTML`-Attribut (vorsichtig bei unzuverlässigen Inhalten verwenden).
     root.querySelectorAll("[data-i18n-html]").forEach((el) => {
       el.innerHTML = t(el.dataset.i18nHtml);
     });
 
-    // placeholder
+    // Übersetzt das `placeholder`-Attribut von Eingabefeldern.
     root.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
       el.placeholder = t(el.dataset.i18nPlaceholder);
     });
 
-    // title
+    // Übersetzt das `title`-Attribut (Tooltip).
     root.querySelectorAll("[data-i18n-title]").forEach((el) => {
       el.title = t(el.dataset.i18nTitle);
     });
 
-    // aria-label
+    // Übersetzt das `aria-label`-Attribut für Barrierefreiheit.
     root.querySelectorAll("[data-i18n-aria-label]").forEach((el) => {
       el.setAttribute("aria-label", t(el.dataset.i18nAriaLabel));
     });
 
-    // document title
+    // Setzt den Titel des Dokuments basierend auf einem Meta-Tag.
     const titleEl = root.querySelector("meta[data-i18n-doc-title]");
     if (titleEl) {
       document.title = t(titleEl.dataset.i18nDocTitle);
@@ -81,7 +81,8 @@
     const data = await chrome.storage.local.get({ uiLanguage: "system" });
     const pref = data.uiLanguage || "system";
 
-    let locale = pref === "system" ? systemLocale() : String(pref).toLowerCase();
+    let locale =
+      pref === "system" ? systemLocale() : String(pref).toLowerCase();
     if (!SUPPORTED.includes(locale)) locale = "en";
 
     currentLocale = locale;

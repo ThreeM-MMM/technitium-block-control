@@ -165,7 +165,7 @@ function baseDomain(hostname) {
   return parts.slice(-2).join(".");
 }
 
-// Resource type badges (derived from performance entries)
+// Resource-Typ-Abzeichen (abgeleitet von Performance-Einträgen der Seite)
 const TYPE_LABEL = {
   img: "IMG",
   image: "IMG",
@@ -210,7 +210,7 @@ function typeLabelsForDomain(blockedDomain, hostTypesObj) {
     }
   }
 
-  // Order by priority of underlying types (stable, predictable)
+  // Nach Priorität der zugrunde liegenden Typen sortieren (stabil und vorhersagbar)
   const ordered = [];
   const seen = new Set();
   for (const pri of TYPE_PRIORITY) {
@@ -219,12 +219,12 @@ function typeLabelsForDomain(blockedDomain, hostTypesObj) {
     ordered.push(label);
     seen.add(label);
   }
-  // Any remaining labels (unknown types) at the end
+  // Verbleibende Labels (unbekannte Typen) am Ende hinzufügen
   for (const label of out) {
     if (!seen.has(label)) ordered.push(label);
   }
 
-  // Keep UI compact: show up to 2 labels, then +N
+  // Hält die Benutzeroberfläche kompakt: Zeigt bis zu 2 Labels an, danach "+N".
   if (ordered.length <= 2) return ordered;
   return [ordered[0], ordered[1], `+${ordered.length - 2}`];
 }
@@ -233,8 +233,7 @@ function isRestrictedUrl(url) {
   if (!url) return true;
   const u = url.toLowerCase();
 
-  // Optional file:// support via Extension setting
-  // (User muss in chrome://extensions -> Details -> "Zugriff auf Datei-URLs erlauben" aktivieren)
+  // Optionale Unterstützung für file://-URLs (erfordert manuelle Freigabe in den Extension-Einstellungen)
   if (u.startsWith("file://")) return false;
 
   return (
@@ -277,8 +276,7 @@ async function refreshStatus() {
   state.classList.toggle("status-on", enabled);
   state.classList.toggle("status-off", !enabled);
 
-  // Visualize status with an emoji (fallback is still readable as text)
-  // Requested: ✅ for enabled, ⛔ for disabled
+  // Visualisiert den Status mit einem Emoji (Fallback ist weiterhin lesbarer Text).
   const emoji = enabled ? "✅" : "⛔";
   state.textContent = `${emoji} ${enabled ? t("popup_state_on") : t("popup_state_off")}`;
 
@@ -309,7 +307,7 @@ async function startCustomTimer() {
   await refreshStatus();
 }
 
-// ===== Page Snapshot =====
+// ===== Seiten-Analyse =====
 
 async function getActiveTab() {
   const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -353,7 +351,7 @@ async function collectPageSnapshot(tabId) {
   return result;
 }
 
-// ===== Rendering =====
+// ===== UI-Rendering =====
 
 function renderList(
   container,
@@ -376,7 +374,7 @@ function renderList(
     const row = document.createElement("div");
     row.className = "rowItem";
 
-    // Hot marker (ab 20)
+    // Markierung für "heiße" Domains (z.B. bei mehr als 20 Block-Vorgängen)
     if ((it.count || 0) >= 20) row.classList.add("hot");
 
     const left = document.createElement("div");
@@ -398,7 +396,7 @@ function renderList(
       count.appendChild(tag);
     }
 
-    // Resource type badges (IMG/JS/CSS/...) if we can infer them from the tab's resource timings
+    // Abzeichen für Ressourcen-Typen (IMG/JS/CSS/...), falls aus den Ressourcen-Timings des Tabs ableitbar
     const typeLabels = typesByDomain?.[it.domain] || [];
     for (const lbl of typeLabels) {
       const tag = document.createElement("span");
@@ -429,7 +427,7 @@ function renderList(
 
     btnWrap.appendChild(primaryBtn);
 
-    // Temp Allow nur wenn nicht already allowed
+    // Button für "Temporär Erlauben" nur anzeigen, wenn die Domain nicht bereits erlaubt ist.
     if (!isAllowed) {
       const btnTemp = document.createElement("button");
       btnTemp.className = "actionBtn";
@@ -444,7 +442,7 @@ function renderList(
   }
 }
 
-// ===== Main Refresh =====
+// ===== Haupt-Aktualisierungsfunktion =====
 
 async function refreshAll() {
   pageStatus.textContent = "";
@@ -483,9 +481,9 @@ async function refreshAll() {
   try {
     snapshot = await collectPageSnapshot(tab.id);
   } catch {
-    // Auf Fehlerseiten (z.B. chrome-error://...) kann kein Snapshot per Performance API
-    // erstellt werden. Wir fallen dann auf ein minimales Snapshot-Objekt zurück,
-    // nutzen aber weiterhin die Tab-URL für das Domain-Matching.
+    // Auf Fehlerseiten (z.B. chrome-error://...) kann die Performance-API fehlschlagen.
+    // In diesem Fall greifen wir auf ein minimales Snapshot-Objekt zurück,
+    // verwenden aber weiterhin die Tab-URL für das Domain-Matching.
     snapshot = {
       pageHost: pageTabHost,
       pageStartEpoch: Date.now(),
@@ -524,20 +522,20 @@ async function refreshAll() {
   const allItems = blockedRes.items || [];
   const pageHosts = snapshot.hosts || [];
 
-  // Precompute resource type badges per blocked domain (if possible)
+  // Berechnet die Abzeichen für Ressourcen-Typen pro geblockter Domain vorab (falls möglich).
   const typesByDomain = {};
   const hostTypesObj = snapshot.hostTypes || {};
   for (const it of allItems) {
     typesByDomain[it.domain] = typeLabelsForDomain(it.domain, hostTypesObj);
   }
 
-  // 1) Domains, die zu Ressourcen-Hosts der Seite passen
+  // 1) Filtern der geblockten Domains, die zu den Ressourcen-Hosts der aktuellen Seite passen.
   let pageRelevant = allItems.filter((it) =>
     pageHosts.some((h) => hostMatchesBlocked(h, it.domain)),
   );
 
-  // 2) Sicherstellen, dass auch die Haupt-Domain der Seite selbst erfasst wird,
-  //    selbst wenn keine Ressourcen geladen wurden (z.B. bei hart geblockter Startseite).
+  // 2) Sicherstellen, dass die Haupt-Domain der Seite selbst berücksichtigt wird,
+  //    auch wenn sie keine expliziten Ressourcen geladen hat (z.B. bei einer komplett geblockten Seite).
   const pageNorm = normalizeDomain(pageTabHost || snapshot.pageHost);
   if (pageNorm) {
     const already = new Set(pageRelevant.map((x) => normalizeDomain(x.domain)));
@@ -549,9 +547,9 @@ async function refreshAll() {
       }
     }
 
-    // 3) Falls die Seite selbst geblockt wurde, aber in allItems noch nicht auftaucht
-    //    (z.B. weil nur NXDOMAIN-Top-Level-Query geloggt wurde), prüfen wir explizit
-    //    per Log-Query gegen Technitium und mergen einen synthetischen Eintrag.
+    // 3) Wenn die Haupt-Domain der Seite geblockt wurde, aber in der Liste `allItems` fehlt
+    //    (z.B. weil nur eine NXDOMAIN-Antwort für die Top-Level-Domain protokolliert wurde),
+    //    fragen wir die Logs explizit für diese Domain ab und fügen bei Bedarf einen synthetischen Eintrag hinzu.
     const existsInAll = allItems.some(
       (it) => normalizeDomain(it.domain) === pageNorm,
     );
@@ -579,7 +577,7 @@ async function refreshAll() {
     }
   }
 
-  // Allow-Status optional (per option) – wir fragen batch an
+  // Fragt den Allow-Status für alle gefundenen Domains in einem Batch-Aufruf ab.
   const domainsForCheck = Array.from(new Set(allItems.map((x) => x.domain)));
   const allowStatusRes = await send("allowedStatusBatch", {
     domains: domainsForCheck,
@@ -627,7 +625,7 @@ async function refreshAll() {
   }
 }
 
-// ===== Wiring =====
+// ===== Event-Listener initialisieren =====
 
 startCustomBtn.addEventListener("click", startCustomTimer);
 refreshAllBtn.addEventListener("click", refreshAll);
@@ -642,18 +640,18 @@ toggleOnlyHits.addEventListener("change", async () => {
   await refreshAll();
 });
 
-// Init
+// Initialisierung
 (async () => {
   await window.TAC_I18N.init();
   window.TAC_I18N.localizePage();
 
-  // Theme toggle button
+  // Initialisiert den Button zum Umschalten des Themes.
   if (themeToggleBtn) {
     await refreshThemeToggle();
     themeToggleBtn.addEventListener("click", cycleTheme);
   }
 
-  // Update icon if theme changes elsewhere
+  // Aktualisiert das Icon, wenn das Theme an anderer Stelle geändert wird (z.B. auf der Optionsseite).
   if (chrome && chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area === "local" && changes.uiTheme) refreshThemeToggle();

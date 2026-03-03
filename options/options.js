@@ -2,7 +2,6 @@ const baseUrlInput = document.getElementById("baseUrl");
 const apiKeyInput = document.getElementById("apiKey");
 const logWindowSecondsInput = document.getElementById("logWindowSeconds");
 const tempAllowMinutesInput = document.getElementById("tempAllowMinutes");
-const showAllowStatusInput = document.getElementById("showAllowStatus");
 const uiLanguageSelect = document.getElementById("uiLanguage");
 const uiThemeSelect = document.getElementById("uiTheme");
 const status = document.getElementById("status");
@@ -30,7 +29,6 @@ chrome.storage.local.get(
     "apiKey",
     "logWindowSeconds",
     "tempAllowMinutes",
-    "showAllowStatus",
     "uiLanguage",
     "uiTheme",
   ],
@@ -43,9 +41,6 @@ chrome.storage.local.get(
 
     tempAllowMinutesInput.value =
       typeof data.tempAllowMinutes === "number" ? data.tempAllowMinutes : 30;
-
-    showAllowStatusInput.checked =
-      typeof data.showAllowStatus === "boolean" ? data.showAllowStatus : false;
 
     if (uiLanguageSelect) {
       uiLanguageSelect.value = data.uiLanguage || "system";
@@ -77,7 +72,6 @@ document.getElementById("save").addEventListener("click", () => {
       apiKey: apiKeyInput.value.trim(),
       logWindowSeconds,
       tempAllowMinutes,
-      showAllowStatus: !!showAllowStatusInput.checked,
       uiLanguage: uiLanguageSelect ? uiLanguageSelect.value : "system",
       uiTheme: uiThemeSelect ? uiThemeSelect.value : "auto",
     },
@@ -85,12 +79,12 @@ document.getElementById("save").addEventListener("click", () => {
       status.textContent = t("options_saved");
       setTimeout(() => (status.textContent = ""), 2000);
 
-      // Apply language switch immediately
+      // Sprachwechsel sofort anwenden
       if (window.TAC_I18N) {
         window.TAC_I18N.init().then(() => window.TAC_I18N.localizePage());
       }
 
-      // Apply theme switch immediately
+      // Theme-Wechsel sofort anwenden
       if (window.TAC_THEME && uiThemeSelect) {
         window.TAC_THEME.apply(uiThemeSelect.value || "auto");
       }
@@ -98,7 +92,7 @@ document.getElementById("save").addEventListener("click", () => {
   );
 });
 
-// Init i18n
+// Initialisiert die Internationalisierung (i18n)
 (async () => {
   if (window.TAC_I18N) {
     await window.TAC_I18N.init();

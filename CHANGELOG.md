@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on **Keep a Changelog**, and this project follows **Semantic Versioning** where possible.
 
+## [0.3.2] - 2024-05-21
+### Changed
+- The "Show Allow Status" feature is now permanently enabled to improve user experience. The corresponding option has been removed from the settings page.
+- All source code comments have been translated to German to improve maintainability.
+
 ## [0.3.1] - 2026-03-02
 ### Fixed
 - Blocked main domains (including NxDomain cases) now reliably appear in the popup, even when the browser shows an internal error page instead of the original site.
